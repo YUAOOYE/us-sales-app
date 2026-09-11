@@ -3,10 +3,10 @@ import pandas as pd
 import numpy as np
 
 # ==============================================================================
-# 1. 页面配置与威霖定制视觉规范
+# 1. 页面配置与企业级高级 BI 科技蓝 CSS
 # ==============================================================================
 st.set_page_config(
-    page_title="宁波威霖住宅设施 · 北美大零售全品类与气候销售决策系统",
+    page_title="宁波威霖住宅设施 · 北美大零售商业与工程决策系统",
     page_icon="🏭",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -14,143 +14,211 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-    .metric-card {
-        background-color: #f8fafc;
-        border-left: 5px solid #0284c7;
-        padding: 14px 18px;
-        margin-bottom: 12px;
-        border-radius: 4px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    /* 全局背景与字体基调 */
+    .stApp { background-color: #F8FAFC; color: #0F172A; }
+    
+    /* 顶部标题区 */
+    .bi-header {
+        background: white;
+        padding: 16px 24px;
+        border-radius: 10px;
+        border: 1px solid #E2E8F0;
+        margin-bottom: 16px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.03);
     }
-    .physics-card {
-        background-color: #f1f5f9;
-        border: 1px solid #cbd5e1;
-        padding: 12px 14px;
-        border-radius: 6px;
-        margin-bottom: 10px;
+    .main-title { font-size: 1.65rem; font-weight: 700; color: #0F172A; margin-bottom: 4px; }
+    .sub-title { font-size: 0.88rem; color: #475569; }
+    
+    /* 控制栏卡片 */
+    .filter-card {
+        background: white;
+        padding: 16px 20px;
+        border-radius: 8px;
+        border: 1px solid #CBD5E1;
+        margin-bottom: 16px;
     }
+    
+    /* 核心 KPI 卡片 */
     .kpi-card {
         background: linear-gradient(135deg, #1E40AF, #2563EB);
         color: white;
         border-radius: 8px;
         padding: 14px 18px;
-        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.08);
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.06);
     }
-    .kpi-title { font-size: 0.84rem; opacity: 0.92; margin-bottom: 2px; font-weight: 500; }
-    .kpi-val { font-size: 1.65rem; font-weight: 700; }
+    .kpi-title { font-size: 0.82rem; opacity: 0.9; margin-bottom: 2px; font-weight: 500; }
+    .kpi-val { font-size: 1.55rem; font-weight: 700; }
     
-    .badge-tier1 { background-color: #dcfce7; color: #166534; padding: 2px 7px; border-radius: 4px; font-weight: 700; font-size: 0.78rem; }
-    .badge-tier2 { background-color: #dbeafe; color: #1e40af; padding: 2px 7px; border-radius: 4px; font-weight: 700; font-size: 0.78rem; }
-    .badge-tier3 { background-color: #fef3c7; color: #92400e; padding: 2px 7px; border-radius: 4px; font-weight: 700; font-size: 0.78rem; }
-    .badge-tier4 { background-color: #fee2e2; color: #991b1b; padding: 2px 7px; border-radius: 4px; font-weight: 700; font-size: 0.78rem; }
+    /* 内容板块卡片 */
+    .section-card {
+        background: white;
+        border: 1px solid #E2E8F0;
+        border-radius: 8px;
+        padding: 16px 18px;
+        margin-bottom: 14px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    }
     
-    .radar-box { border-left: 4px solid #EF4444; background-color: #FEF2F2; padding: 10px 14px; border-radius: 0 6px 6px 0; margin-top: 10px; }
-    .advice-box { border-left: 4px solid #3B82F6; background-color: #EFF6FF; padding: 10px 14px; border-radius: 0 6px 6px 0; margin-top: 10px; }
-    .cert-badge { background-color: #f1f5f9; border: 1px solid #cbd5e1; color: #0f172a; padding: 3px 6px; border-radius: 4px; font-size: 0.75rem; margin-right: 4px; display: inline-block; margin-bottom: 4px; }
+    /* 竞品对标专属卡片 */
+    .competitor-card {
+        background: #F1F5F9;
+        border-left: 4px solid #64748B;
+        border-radius: 0 6px 6px 0;
+        padding: 12px 16px;
+        margin-bottom: 10px;
+    }
+    .willi-card {
+        background: #EFF6FF;
+        border-left: 4px solid #2563EB;
+        border-radius: 0 6px 6px 0;
+        padding: 12px 16px;
+        margin-bottom: 10px;
+    }
+    
+    /* 徽章 Badge 体系 */
+    .badge-tier1 { background-color: #DCFCE7; color: #166534; padding: 2px 7px; border-radius: 4px; font-weight: 700; font-size: 0.75rem; }
+    .badge-tier2 { background-color: #DBEAFE; color: #1E40AF; padding: 2px 7px; border-radius: 4px; font-weight: 700; font-size: 0.75rem; }
+    .badge-tier3 { background-color: #FEF3C7; color: #92400E; padding: 2px 7px; border-radius: 4px; font-weight: 700; font-size: 0.75rem; }
+    .badge-tier4 { background-color: #FEE2E2; color: #991B1B; padding: 2px 7px; border-radius: 4px; font-weight: 700; font-size: 0.75rem; }
+    .cert-pill { background-color: #F8FAFC; border: 1px solid #CBD5E1; color: #334155; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; margin-right: 4px; margin-bottom: 4px; display: inline-block; }
+    .cert-pill-red { background-color: #FEF2F2; border: 1px solid #FCA5A5; color: #991B1B; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; margin-right: 4px; margin-bottom: 4px; display: inline-block; }
 </style>
 """, unsafe_allow_html=True)
 
 # ==============================================================================
-# 2. 侧边栏：威霖出海财务与买手测算器
+# 2. 侧边栏：威霖外贸买手财务核算器
 # ==============================================================================
 with st.sidebar:
-    st.image("https://img.icons8.com/fluency/96/factory.png", width=54)
-    st.title("威霖制造 · 出海决策中台")
+    st.image("https://img.icons8.com/fluency/96/factory.png", width=48)
+    st.markdown("### 💰 威霖外贸到岸财务测算")
     st.caption("宁波威霖住宅设施有限公司 (建霖家居 603408)")
     st.markdown("---")
     
-    st.markdown("### 💰 威霖外贸买手核价与到岸毛利试算")
     fob_cost = st.number_input("1. 威霖出厂供货价 FOB ($/件)：", min_value=0.5, max_value=200.0, value=3.80, step=0.2)
     ocean_freight = st.number_input("2. 单件美线分摊海运费 ($/件)：", min_value=0.0, max_value=50.0, value=0.65, step=0.05)
     tariff_pct = st.number_input("3. 关税税率 Tariff (%)：", min_value=0.0, max_value=100.0, value=7.5, step=0.5) / 100.0
     retail_msrp = st.number_input("4. 北美商超零售价 MSRP ($/件)：", min_value=1.0, max_value=500.0, value=12.98, step=0.5)
-    case_pack = st.number_input("5. 标准箱外箱装数 (Case Pack)：", min_value=1, max_value=100, value=10, step=1)
+    case_pack = st.number_input("5. 标准箱装数 (Case Pack)：", min_value=1, max_value=100, value=10, step=1)
     
     landed_cost = fob_cost * (1 + tariff_pct) + ocean_freight
     buyer_margin = ((retail_msrp - landed_cost) / retail_msrp) * 100
     gross_profit_unit = retail_msrp - landed_cost
     
-    st.markdown(f"• **到岸完税成本 (Landed DDP)**: **${landed_cost:.2f}**")
-    st.markdown(f"• **商超单件毛利额**: **${gross_profit_unit:.2f}**")
-    
-    if buyer_margin < 40.0:
-        st.markdown(f'<span class="badge-tier4">⚠️ 零售到岸毛利率：{buyer_margin:.1f}% (偏低，低于40%采购门槛)</span>', unsafe_allow_html=True)
-    elif buyer_margin <= 55.0:
-        st.markdown(f'<span class="badge-tier1">✅ 零售到岸毛利率：{buyer_margin:.1f}% (商超黄金采购区间)</span>', unsafe_allow_html=True)
-    else:
-        st.markdown(f'<span class="badge-tier1">🌟 零售到岸毛利率：{buyer_margin:.1f}% (超55%极具采购竞争力)</span>', unsafe_allow_html=True)
+    st.markdown(f"""
+    <div style='background:white;padding:12px;border-radius:6px;border:1px solid #E2E8F0;'>
+        <span style='font-size:0.82rem;color:#64748B;'>到岸完税成本 (Landed DDP)</span><br>
+        <b style='font-size:1.2rem;color:#0F172A;'>${landed_cost:.2f}</b><br><br>
+        <span style='font-size:0.82rem;color:#64748B;'>商超零售净毛利率 (Buyer Margin)</span><br>
+        <b style='font-size:1.2rem;color:{'#166534' if buyer_margin>=42 else '#991B1B'};'>{buyer_margin:.1f}%</b>
+    </div>
+    """, unsafe_allow_html=True)
     
     st.markdown("---")
-    st.markdown("### 🏭 威霖象山工业园制造能力标签")
-    st.caption("""
-    • **占地面积**：14 万平方米智能制造基地  
-    • **核心工艺**：自动化冲压、智能注塑、绿色PVD镀膜、重防腐电泳、精密模具研发  
-    • **合规体系**：ISO 9001 / ISO 14001 / cUPC 实验室 / UL 认证实验室
-    """)
+    st.caption("🏭 **威霖象山工业园能力背书**：\n• 14 万平米智能基地\n• 绿色环保PVD镀膜中心\n• 自动化冲压/注塑产线\n• cUPC/UL 认证目击实验室")
 
 # ==============================================================================
-# 3. 核心品类配置（100% 对标宁波威霖实际产线）
+# 3. 品类元数据与对家竞品版图（完全对标宁波威霖产线与北美对家）
 # ==============================================================================
 CATEGORY_CONFIG = {
     "HVAC": {
-        "name": "暖通风口与空气分配末端 (Registers & Diffusers)",
-        "willi_fit": "威霖主力核心板块：冲压冷轧钢、阳极氧化铝、工程阻燃塑料出风口全系列。",
+        "name": "暖通风口与空气分配系统 (Registers & Grilles)",
+        "willi_fit": "威霖主力产品线：冲压钢、阳极氧化铝、压铸锌合金复古雕花、工程ABS出风口全系列。",
+        "competitors": {
+            "main_rival": "Accord Ventilation (全美风口第一巨头) / Deflecto (塑料与工程通货垄断者)",
+            "shelf_share": "约 55% ~ 65% 黄金通道货架排面",
+            "rival_msrp": "$13.98 (高于威霖预估价)",
+            "rival_margin": "38% ~ 42% (给买手毛利空间有限)",
+            "rival_weakness": "以传统冲压钢与普通喷漆为主，缺乏 PVD 和 AF 纳米防指纹等高端工艺，极端气候易生锈。",
+            "willi_tactic": "以高质感阳极氧化铝与 PVD 哑光黑打改善型高溢价，给商超买手留出 52%+ 净毛利，抢夺双排面。"
+        },
         "positions": ["Floor (地面出风口)", "Ceiling (天花板散流器)", "Baseboard (踢脚线出风口)", "Sidewall (侧墙回风格栅)"],
-        "materials": ["Steel (冲压冷轧钢)", "Aluminum (铝合金阳极氧化)", "Plastic (ABS阻燃树脂)", "Cast Metal (铸铝/铸铁重载)"],
-        "finishes": ["BL (Matte Black 哑光黑)", "BN (Brushed Nickel 拉丝镍)", "WH (White 经典白)", "AB (Antique Brass 仿古铜)", "ORB (Oil Rubbed Bronze 油磨青铜)"],
-        "sizes": ["04X10 (全美走量王 65%)", "04X12 (主流换新大号 20%)", "02X12 (踢脚狭长缝 10%)", "06X10 (大出风量 5%)", "12X12 (天花板方型)"],
-        "national_certs": ["ASHRAE 70 (风量CFM与噪音NC评级测试)", "UL 94 (塑料阻燃V-0级认证)", "Heel-Proof (细高跟鞋防卡穿透试验)"]
+        "materials": ["Steel (冲压冷轧钢)", "Aluminum (铝合金阳极氧化)", "Plastic (ABS阻燃树脂)", "Cast Metal (铸铝/铸铁重载)", "Engineered Wood (多层实木复合-抗翘曲)", "Zinc Die-Cast (压铸锌合金雕花)"],
+        "finishes": ["Matte Black (US19 哑光黑)", "Brushed Nickel (US15 拉丝镍)", "Glossy White (经典工程白)", "Oil Rubbed Bronze (US10B 油磨青铜)", "PVD Brushed Gold (轻奢拉丝金)", "AF Nano-Coating (纳米防指纹黑)", "Wood Grain Transfer (3D热转印木纹)"],
+        "sizes": ["04X10 (全美走量王 65%)", "04X12 (主流换新大号 20%)", "02X12 (踢脚狭长缝 10%)", "06X10 (大排风量 5%)", "12X12 (天花方型大尺寸)"],
+        "national_certs": ["ASHRAE Standard 70 (风量CFM与噪音NC评级测试)", "UL 94 (阻燃塑料V-0/HB级)", "Heel-Proof (细高跟鞋防卡穿透安全测试)"]
     },
     "PLUMBING": {
         "name": "卫浴排水与长条隐形地漏 (Drains & Plumbing)",
-        "willi_fit": "威霖主力核心板块：不锈钢冲压拉伸、长条隐形线性地漏、防臭下水器全系列。",
-        "positions": ["Floor Drain (方形地面地漏)", "Linear Drain (长条隐形淋浴地漏)", "Tile-in (瓷砖双面隐形地漏)", "Frost-Proof (室外防冻水阀)"],
+        "willi_fit": "威霖主力产品线：不锈钢冲压拉伸、长条隐形线性地漏、防臭下水器、防冻长水阀全系列。",
+        "competitors": {
+            "main_rival": "Oatey (全美水暖耗材霸主) / Sioux Chief (本土工匠龙头) / Neodrain (线上排头)",
+            "shelf_share": "约 60% 商超水暖通道排面",
+            "rival_msrp": "$49.99 (长条地漏) / $11.50 (点状地漏)",
+            "rival_margin": "40% ~ 44%",
+            "rival_weakness": "长条地漏款式老旧，多以单面格栅为主；少有 Tile-in 2合1 隐形翻转结构。",
+            "willi_tactic": "力推 2合1 瓷砖隐形面板，一个 SKU 满足两类需求，节省买手货架空间，以 304/316 精工拉丝降本突围。"
+        },
+        "positions": ["Linear Drain (长条隐形地漏)", "Tile-in Drain (2合1瓷砖隐形地漏)", "Floor Drain (方形点状地漏)", "Frost-Proof Valve (室外防冻长水阀)"],
         "materials": ["Stainless 304 (304拉丝不锈钢)", "Stainless 316 (316耐氯盐雾级)", "Solid Brass (无铅锻压黄铜)", "ABS/PVC (耐腐工程塑料)"],
-        "finishes": ["BN (Brushed Nickel 经典拉丝镍)", "MB (Matte Black 现代哑光黑)", "CP (Chrome 抛光亮铬)", "BG (Brushed Gold PVD拉丝金)"],
-        "sizes": ["4x4 inch (标准方形地漏)", "24-36 inch (长条隐形地漏)", "1/2 inch (常规接口)", "3/4 inch (主水管接口)"],
-        "national_certs": ["cUPC 认证 (IAPMO 强制排水与管件证书)", "ASME A112.18.2 / CSA B125.2 (地漏通量测试)", "NSF/ANSI 61 & 372 (接触饮用水无铅涉水安全认证)"]
+        "finishes": ["Brushed Stainless (不锈钢拉丝)", "Matte Black (现代哑光黑)", "Polished Chrome (亮铬镜面)", "PVD Brushed Gold (PVD防磨金)"],
+        "sizes": ["24-36 inch (长条隐形主力)", "4x4 inch (标准方形)", "1/2 inch (常规供水接口)", "3/4 inch (主水管接口)"],
+        "national_certs": ["cUPC 认证 (IAPMO 强制排水与管件证书)", "ASME A112.18.2 / CSA B125.2 (通量试验)", "NSF/ANSI 61 & 372 (接触饮用水无铅涉水认证)"]
     },
     "HANGERS": {
         "name": "管道支吊架与抗震支撑系统 (Support & Hanger Systems)",
-        "willi_fit": "威霖特色工程王牌：建筑管道吊卡、C型槽钢构件、抗震连接件、商用管道支撑。",
-        "positions": ["Strut Channel (C型装配式槽钢系统)", "Pipe Clamp (重载管道固定卡箍)", "Seismic Hanger (抗震斜撑加固组件)", "Beam Clamp (工字钢梁夹连接件)"],
-        "materials": ["Carbon Steel (重载碳钢镀锌)", "Hot-Dip Galvanized (重型热浸镀锌钢)", "Stainless 304 (不锈钢防腐型)", "Ductile Iron (球墨铸铁梁夹)"],
-        "finishes": ["Clear Zinc (冷电镀蓝白锌 EG)", "Yellow Zinc (环保三价铬彩锌)", "HDG (热浸镀锌厚层防腐)", "Black E-Coat (阴极电泳底漆)"],
-        "sizes": ["13/16 inch (轻型槽深)", "1-5/8 inch (全美标准重载槽钢)", "1/2-2 inch (小管径管卡)", "3-6 inch (重型主立管卡)"],
-        "national_certs": ["MSS SP-58 (全美管道吊架与支撑设计制造通用标准)", "UL 203 (消防喷淋管道吊架强制认证)", "FM 1951 (抗震支撑组件认证)"]
+        "willi_fit": "威霖工程王牌业务：建筑管道吊卡、C型装配式槽钢构件、抗震紧固件、商用管道支撑。",
+        "competitors": {
+            "main_rival": "Superstrut (Thomas & Betts / ABB) / Unistrut (Atkore) / Erico (nVent CADDY)",
+            "shelf_share": "约 70% 商用与电气五金通道排面",
+            "rival_msrp": "$18.50 (10尺槽钢) / $2.80 (2寸管卡)",
+            "rival_margin": "35% ~ 38% (对家品牌溢价高，买手利薄)",
+            "rival_weakness": "重型热浸镀锌件价格昂贵，交付周期长；对家缺乏柔性冲压组件的定制配套能力。",
+            "willi_tactic": "依托象山工业园的自动化连续冲压和重防腐热浸镀锌/达克罗能力，以商超自有品牌 (Store Brand) 切入，提供极具诱惑力的高毛利全套配件装配包。"
+        },
+        "positions": ["Strut Channel (C型装配式槽钢)", "Pipe Clamp (管道固定卡箍)", "Seismic Hanger (抗震斜撑加固组件)", "Beam Clamp (工字钢梁夹连接件)"],
+        "materials": ["Carbon Steel (重载碳钢)", "Hot-Dip Galvanized Steel (热浸镀锌结构钢)", "Stainless 304 (不锈钢防腐型)", "Ductile Iron (球墨铸铁梁夹)"],
+        "finishes": ["Clear Zinc (EG 冷电镀蓝白锌)", "Yellow Zinc (环保三价铬彩锌)", "Hot-Dip Galvanized (HDG 重型热浸镀锌)", "Dacromet (达克罗防腐涂层)", "Black E-Coating (阴极电泳黑)"],
+        "sizes": ["1-5/8 inch (全美标准重载槽钢)", "13/16 inch (轻型槽深)", "1/2-2 inch (中小管径卡箍)", "3-6 inch (重载立管卡)"],
+        "national_certs": ["MSS SP-58 (全美管道吊架设计制造通用标准)", "UL 203 (消防喷淋管道吊架强制认证)", "FM 1951 (抗震支撑组件认证)"]
     },
     "SHOWER_HARDWARE": {
         "name": "淋浴门与门窗五金构件 (Shower Door & Enclosures)",
-        "willi_fit": "威霖主力核心板块：淋浴房铰链、滚轮滑轨、不锈钢合页、门底挡风防水条。",
-        "positions": ["Shower Hinge (无框玻璃淋浴房合页)", "Door Sweep (门底防风挡水密封条)", "Hurricane Tie (建筑抗飓风加固角码)", "Heavy Duty Hinge (重型承重门合页)"],
-        "materials": ["Solid Brass (精铸无铅纯铜)", "Stainless 304 (304防锈不锈钢)", "Aluminum + Silicone (铝合金托底+耐候硅胶)", "Hot-Dip Galvanized (热浸镀锌结构钢)"],
-        "finishes": ["Matte Black (US19 现代黑)", "Brushed Nickel (US15 缎面拉丝镍)", "Bright Chrome (US26 抛光亮铬)", "PVD Brushed Brass (US4 耐磨金)"],
-        "sizes": ["36 inch (单门标准长)", "42 inch (大入户门底条)", "4x4 inch (重载大门合页)", "50 ft Roll (50英尺整卷密封条)"],
-        "national_certs": ["ANSI/BHMA A156.1 (100万次开合疲劳测试)", "ANSI Z97.1 / CPSC 16 CFR 1201 (安全玻璃与五金承重规范)", "UL 10C (90分钟正压防火门认证)"]
+        "willi_fit": "威霖优势产线：无框淋浴房精铸铰链、滚轮导轨、门底密封防风条、抗风加固件。",
+        "competitors": {
+            "main_rival": "DreamLine (北美淋浴房零售霸主) / CRL (C.R. Laurence 玻璃工匠标杆) / Simpson Strong-Tie (抗飓风件大鳄)",
+            "shelf_share": "展厅专区垄断",
+            "rival_msrp": "$45.00 (精铸铰链) / $22.00 (门底扫风条)",
+            "rival_margin": "42% ~ 45%",
+            "rival_weakness": "对家配件价格昂贵，小五金配件多零散售卖，缺少便于 DIY 和工匠整包拿取的套件。",
+            "willi_tactic": "提供精铸黄铜+无铅认证铰链，搭配 EPDM 耐候发泡门底条做套件包，主打零锈蚀与终身顺滑开合。"
+        },
+        "positions": ["Shower Hinge (无框玻璃重型合页)", "Door Sweep (门底防风挡水密封条)", "Hurricane Tie (建筑抗飓风加固角码)", "Heavy Duty Hinge (重载大门合页)"],
+        "materials": ["Solid Brass (精铸无铅纯铜)", "Stainless 304 (304防锈不锈钢)", "Aluminum + EPDM (铝合金+耐候EPDM橡胶)", "Hot-Dip Galvanized Steel (热浸镀锌结构钢)"],
+        "finishes": ["Matte Black (US19 哑光黑)", "Brushed Nickel (US15 缎面拉丝镍)", "Bright Chrome (US26 抛光亮铬)", "PVD Brushed Brass (US4 耐磨金)"],
+        "sizes": ["36 inch (单门标准长)", "42 inch (大入户门底条)", "4x4 inch (重载大门合页)", "50 ft Roll (50英尺整卷工程条)"],
+        "national_certs": ["ANSI/BHMA A156.1 (100万次开合疲劳测试)", "ANSI Z97.1 / CPSC 16 CFR 1201 (安全玻璃与五金承重标准)", "UL 10C (90分钟正压防火门认证)"]
     },
     "OUTDOOR_DRAIN": {
         "name": "户外排水与景观系统 (Outdoor Drainage & Grates)",
-        "willi_fit": "威霖延伸产线：庭院车道线性排水槽、重载钢格栅、外墙通风百叶罩。",
-        "positions": ["Trench Drain (车道/泳池线性排水沟)", "Gutter Guard (屋檐排水天沟防叶滤网)", "Post Anchor (木露台立柱固定底座)", "Outdoor Vent (外墙防风雨冲压罩)"],
-        "materials": ["Polymer/HDPE (耐暴晒重型塑料)", "Hot-Dip Galvanized (热镀锌重钢格栅)", "Ductile Cast Iron (球墨铸铁重载盖板)", "Cast Aluminum (耐候防腐铸铝)"],
-        "finishes": ["Black Asphalt (沥青防腐黑)", "Galvanized Silver (热镀锌亮银)", "Natural Gray (水泥工程灰)"],
+        "willi_fit": "威霖延伸产线：车道线性排水槽、重载钢格栅、防落叶天沟滤网、外墙通风百叶罩。",
+        "competitors": {
+            "main_rival": "NDS (全美住宅与商业雨水排水霸主) / ACO (高端聚合物排水沟标杆)",
+            "shelf_share": "户外建材园艺区 75% 排面垄断",
+            "rival_msrp": "$38.00 (1米塑料沟槽带格栅)",
+            "rival_margin": "45% ~ 48%",
+            "rival_weakness": "对家以塑料格栅为主，车辆碾压易碎；铸铁和镀锌重型格栅售价极高。",
+            "willi_tactic": "推出重型热浸镀锌钢格栅与高密度耐暴晒 HDPE 组合，以汽车级 C250 承重等级降维打击普通塑料款。"
+        },
+        "positions": ["Trench Drain (车道线性排水沟)", "Gutter Guard (天沟防落叶过滤网)", "Post Anchor (木露台立柱固定底座)", "Outdoor Vent (外墙防风雨冲压百叶)"],
+        "materials": ["Polymer/HDPE (耐暴晒重型工程塑料)", "Hot-Dip Galvanized Steel (热浸镀锌重钢格栅)", "Ductile Cast Iron (球墨铸铁重载盖板)", "Cast Aluminum (耐候防腐铸铝)"],
+        "finishes": ["Galvanized Silver (热镀锌亮银)", "Black Asphalt (沥青防腐黑)", "Natural Gray (工程水泥灰)"],
         "sizes": ["39 inch / 1 Meter (标准单段沟长)", "5-6 inch (标准屋檐天沟网)", "4x4 inch (木方柱底座)", "6x6 inch (重载立柱底座)"],
-        "national_certs": ["EN 1433 / ANSI A112.6.3 (A15行人 ~ C250汽车承重等级)", "ASTM A123 (热浸镀锌耐盐雾防腐标准)", "ASTM G154 (户外高强度抗紫外线黄变及脆化测试)"]
+        "national_certs": ["EN 1433 / ANSI A112.6.3 (A15~C250汽车承载试验)", "ASTM A123 (热浸镀锌层附着力与防腐试验)", "ASTM G154 (抗UV黄变脆化试验)"]
     }
 }
 
 # ==============================================================================
-# 4. 全美 50 州精准工程与物理数据库（含地基结构与州级认证红线）
+# 4. 全美 50 州全字段深度数据库（包含地基形态、物理参数与州级认证）
 # ==============================================================================
 STATES_DATA = {
     "NC": {
         "cn": "北卡罗来纳州", "name": "North Carolina", "region": "美东南", "thd": 72, "lowes": 105, "menards": 0, "dc": "夏洛特(Lowe's大本营)",
-        "foundation": "架空层/地下室(75%+)", "climate": "Zone 4A/3A 混合湿润", "flooring": "实木 45%, LVP 35%, 瓷砖 10%, 地毯 10%",
+        "foundation": "木结构架空层/地下室(75%+)", "climate": "Zone 4A/3A 混合湿润", "flooring": "实木 45%, LVP 35%, 瓷砖 10%, 地毯 10%",
         "best": "威霖地面出风口、实木高低压条、防潮五金", "avoid": "未做防锈处理冷轧薄铁件",
         "size_breakdown": "地面主力: 4x10 (65%); 换新大尺寸: 4x12 (20%); 踢脚线狭窄区: 2x12 (10%); 回风: 6x10 (5%)",
         "channel_advice": "Lowe's全球总部大本营，THD门店流转极快，重度配置端架(Endcap)促销位。",
         "hdd": 3400, "cdd": 1600, "frost_depth": 12, "water_hardness": 3.0, "salt_risk": "中", "hazard": "沿海飓风/湿热雷暴", "house_age": 33, "hazard_idx": 5, "base_vel": 42.0,
-        "state_certs": ["NC State Building Code (沿海风暴锚固)", "ASHRAE 90.1 通风能效审计"]
+        "state_certs": ["NC State Building Code (沿海风暴紧固标准)", "ASHRAE 90.1 通风能耗审计"]
     },
     "TN": {
         "cn": "田纳西州", "name": "Tennessee", "region": "美南", "thd": 44, "lowes": 58, "menards": 0, "dc": "孟菲斯全美物流中心",
@@ -204,7 +272,7 @@ STATES_DATA = {
         "size_breakdown": "地面主力: 4x10 (65%); 4x12 (20%); 2x12 (10%); 回风: 6x10 (5%)",
         "channel_advice": "大芝加哥商超网络极其密集，单店流转稳定，总盘吞吐量位列全美第一梯队。",
         "hdd": 6100, "cdd": 900, "frost_depth": 42, "water_hardness": 14.5, "salt_risk": "极高", "hazard": "芝加哥狂风暴雪融雪盐", "house_age": 56, "hazard_idx": 7, "base_vel": 30.0,
-        "state_certs": ["City of Chicago Building Code (芝加哥防火及建筑严格标准)", "UL 203 吊架"]
+        "state_certs": ["City of Chicago Building Code (芝加哥建筑法规)", "UL 203 吊架"]
     },
     "MI": {
         "cn": "密歇根州", "name": "Michigan", "region": "美中", "thd": 70, "lowes": 43, "menards": 44, "dc": "底特律仓",
@@ -217,44 +285,44 @@ STATES_DATA = {
     },
     "FL": {
         "cn": "佛罗里达州", "name": "Florida", "region": "美东南", "thd": 155, "lowes": 110, "menards": 0, "dc": "奥兰多/迈阿密",
-        "foundation": "95%+混凝土平板地基(Slab)", "climate": "Zone 1A/2A 极湿热高盐雾飓风", "flooring": "瓷砖 60%, 强化/LVP 25%, 地毯 15%",
-        "best": "威霖天花散流器、不锈钢长条地漏、抗飓风门窗五金", "avoid": "地面出风口 (实心水泥地，绝对禁发货!)",
+        "foundation": "95%+混凝土实心大平板(Slab)", "climate": "Zone 1A/2A 极湿热高盐雾飓风", "flooring": "瓷砖 60%, 强化/LVP 25%, 地毯 15%",
+        "best": "威霖天花散流器、不锈钢长条地漏、抗飓风角码", "avoid": "地面出风口 (实心水泥地无孔，绝对禁发货!)",
         "size_breakdown": "天花板主推: 6x6, 8x8, 12x12 (65%); 侧墙回风: 14x6, 20x20 (35%)",
         "channel_advice": "纯制冷市场，严禁发地面风口；主推 HVHZ 抗飓风门窗五金与防腐地漏。",
         "hdd": 500, "cdd": 3800, "frost_depth": 0, "water_hardness": 14.0, "salt_risk": "极低", "hazard": "HVHZ五级强飓风/极高盐雾", "house_age": 34, "hazard_idx": 9, "base_vel": 21.0,
-        "state_certs": ["Miami-Dade NOA (迈阿密-戴德县抗飞弹飓风最高认证)", "FBC (Florida Building Code) HVHZ标准", "cUPC 耐盐雾淋浴地漏认证"]
+        "state_certs": ["Miami-Dade NOA (迈阿密-戴德县抗飓风最高认证)", "FBC HVHZ 标准", "cUPC 淋浴地漏"]
     },
     "CA": {
         "cn": "加利福尼亚州", "name": "California", "region": "美西", "thd": 234, "lowes": 112, "menards": 0, "dc": "洛杉矶/安大略总仓",
         "foundation": "南加全平板/抗震高要求", "climate": "Zone 3B/4B 干燥温和干热", "flooring": "瓷砖 45%, LVP 35%, 地毯 20%",
-        "best": "威霖 Title 24环保风口、抗震支架组件、WUI防飞烬外墙罩", "avoid": "高铅铸造件、普通易燃塑料",
+        "best": "威霖 Title 24环保风口、抗震支架组件、WUI防飞烬百叶", "avoid": "高铅铸造件、普通易燃塑料",
         "size_breakdown": "天花主推: 6x6, 8x8, 10x10 (60%); 侧墙格栅: 14x6 (40%)",
         "channel_advice": "全美最大单一经济体，但加州 65 号提案（Prop 65 铅标）是法律诉讼雷区，必须贴标。",
         "hdd": 2100, "cdd": 1300, "frost_depth": 0, "water_hardness": 9.5, "salt_risk": "极低", "hazard": "WUI山火/高烈度地震/Prop 65铅标", "house_age": 48, "hazard_idx": 7, "base_vel": 20.0,
-        "state_certs": ["加州 Proposition 65 无铅环保警告标签 (极严强制)", "加州 Title 24 气密性能源审计法案", "加州 HCAI/OSHPD 管道抗震支吊架预审批", "加州 WUI (Wildland-Urban Interface) 1/8寸防火防飞烬认证"]
+        "state_certs": ["加州 Prop 65 无铅警告贴标 (一票否决红线)", "加州 Title 24 气密性法案", "加州 HCAI/OSHPD 管道抗震支吊架预审批", "加州 WUI 防火防飞烬认证"]
     },
     "TX": {
         "cn": "德克萨斯州", "name": "Texas", "region": "美南核心", "thd": 182, "lowes": 145, "menards": 0, "dc": "达拉斯/休斯敦大仓",
         "foundation": "85%+混凝土实心大平板(Slab)", "climate": "Zone 2A/3A/3B 漫长干热湿热", "flooring": "瓷砖 50%, 抛光强化 30%, 地毯 20%",
-        "best": "威霖天花散流器、回风百叶格栅、重型管道吊架", "avoid": "地面下沉式出风口 (实心地基无孔可用!)",
+        "best": "威霖天花散流器、回风百叶格栅、重型管道吊卡", "avoid": "地面下沉式出风口 (实心地基无孔可用!)",
         "size_breakdown": "天花散流器: 6x6, 8x8, 12x12 (70%); 墙面回风: 14x6, 20x20 (30%)",
         "channel_advice": "全美建材总盘第一大州，虽单店被门店密摊薄，但总吞吐量是工厂开工基本盘。",
         "hdd": 1600, "cdd": 3000, "frost_depth": 5, "water_hardness": 12.5, "salt_risk": "低", "hazard": "酷暑极干热/偶发寒潮破管", "house_age": 31, "hazard_idx": 6, "base_vel": 22.0,
-        "state_certs": ["TDI (Texas Dept of Insurance) 沿海防风认证", "ASHRAE 90.1 能耗标准", "MSS SP-58 吊架承重测试"]
+        "state_certs": ["TDI 德州保险厅沿海防风认证", "ASHRAE 90.1 能耗审计", "MSS SP-58 承重测试"]
     }
 }
 
-# 补充其余 39 州基础数据库，保证全美 50 州完整
-EXTRA_STATES_CONFIG = {
-    "PA": ("宾夕法尼亚州", "Pennsylvania", "美东", 73, 83, 0, "全地下室占85%+", 5400, 900, 38, 8.5, "极高", "老房融雪盐", 58, 28.5, ["ASTM B117 盐雾 480h", "cUPC 地漏"]),
-    "NY": ("纽约州", "New York", "美东北", 100, 68, 0, "市区公寓无风管/郊区独栋地下室", 5900, 800, 48, 5.5, "极高", "湖效应暴雪", 62, 26.0, ["NYSERDA 能源认证", "UL 94 阻燃"]),
-    "WI": ("威斯康星州", "Wisconsin", "美中", 28, 14, 45, "全地下室普及率极高", 7400, 550, 54, 14.5, "极高", "暴雪融雪盐", 51, 25.5, ["Menards 供应商标准", "MSS SP-58"]),
-    "MN": ("明尼苏达州", "Minnesota", "美中", 35, 12, 38, "全地下室/水暖多", 8500, 550, 60, 14.0, "极高", "全美最深冻土(60寸)", 46, 24.5, ["IPC 305.4 超长防冻水阀规范", "UL 203 吊架"]),
+# 补全其余 39 州基础数据库
+EXTRA_STATES = {
+    "PA": ("宾夕法尼亚州", "Pennsylvania", "美东", 73, 83, 0, "老房全地下室比例高", 5400, 900, 38, 8.5, "极高", "老房融雪盐", 58, 28.5, ["ASTM B117 盐雾 480h", "cUPC 地漏"]),
+    "NY": ("纽约州", "New York", "美东北", 100, 68, 0, "市区公寓无风管/独栋地下室", 5900, 800, 48, 5.5, "极高", "湖效应暴雪", 62, 26.0, ["NYSERDA 能源认证", "UL 94 阻燃"]),
+    "WI": ("威斯康星州", "Wisconsin", "美中", 28, 14, 45, "全地下室普及率极高", 7400, 550, 54, 14.5, "极高", "暴雪融雪盐", 51, 25.5, ["Menards 质量验收标准", "MSS SP-58"]),
+    "MN": ("明尼苏达州", "Minnesota", "美中", 35, 12, 38, "全地下室/深冻土水暖多", 8500, 550, 60, 14.0, "极高", "全美最深冻土(60寸)", 46, 24.5, ["IPC 305.4 超长防冻水阀规范", "UL 203 吊架"]),
     "CO": ("科罗拉多州", "Colorado", "山地大区", 47, 28, 0, "防冻全地下室", 6200, 600, 36, 7.5, "高", "高海拔强紫外线", 38, 24.0, ["WUI 山火防飞烬网", "ASHRAE 70"]),
-    "WA": ("华盛顿州", "Washington", "美西北", 48, 38, 0, "架空层/现代高气密住宅", 4900, 300, 18, 2.5, "低", "长年阴雨高湿", 43, 23.5, ["WA State Energy Code", "ASTM G154 户外防霉测试"]),
-    "AZ": ("亚利桑那州", "Arizona", "美西南", 58, 33, 0, "100%混凝土平板地基(Slab)", 1200, 3500, 0, 16.5, "极低", "极端沙漠酷暑+极硬水", 30, 19.5, ["NSF 372 无铅涉水", "抗紫外线黄变测试"]),
-    "AK": ("阿拉斯加州", "Alaska", "美西北", 7, 5, 0, "永久冻土抬升/保温地基", 10500, 0, 72, 6.0, "中", "全美最高寒(HDD>10000)", 42, 25.0, ["极低温-40℃冲击韧性测试", "超耐寒密封"]),
-    "HI": ("夏威夷州", "Hawaii", "美西", 7, 4, 0, "火山岩/防潮桩", 0, 4200, 0, 3.0, "低", "纯海岛极端高盐雾", 47, 18.0, ["ASTM B117 盐雾 1000h+ (强制316级)", "cUPC"]),
+    "WA": ("华盛顿州", "Washington", "美西北", 48, 38, 0, "架空层/现代高气密住宅", 4900, 300, 18, 2.5, "低", "长年阴雨高湿", 43, 23.5, ["WA State Energy Code", "ASTM G154 户外防霉"]),
+    "AZ": ("亚利桑那州", "Arizona", "美西南", 58, 33, 0, "100%混凝土实心大平板(Slab)", 1200, 3500, 0, 16.5, "极低", "极端沙漠酷暑+极硬水", 30, 19.5, ["NSF 372 无铅涉水", "抗紫外线黄变测试"]),
+    "AK": ("阿拉斯加州", "Alaska", "美西北", 7, 5, 0, "永久冻土抬升地基", 10500, 0, 72, 6.0, "中", "全美最高寒(HDD>10000)", 42, 25.0, ["极低温-40℃冲击韧性测试", "超耐寒密封"]),
+    "HI": ("夏威夷州", "Hawaii", "美西", 7, 4, 0, "火山岩/架空防潮桩", 0, 4200, 0, 3.0, "低", "纯海岛极端高盐雾", 47, 18.0, ["ASTM B117 盐雾 1000h+ (强制316级)", "cUPC"]),
     "MO": ("密苏里州", "Missouri", "美中", 39, 33, 19, "传统全地下室木屋", 4800, 1400, 28, 11.0, "高", "冰融循环", 47, 27.5, ["ASHRAE 70", "MSS SP-58"]),
     "AL": ("阿拉巴马州", "Alabama", "美东南", 29, 34, 0, "平原浅架空", 2600, 1900, 5, 4.5, "低", "雷暴雨林", 36, 28.0, ["ASTM A153 镀锌", "cUPC"]),
     "AR": ("阿肯色州", "Arkansas", "美南", 15, 20, 0, "林区架空层木屋", 3200, 1700, 10, 5.0, "低", "雷暴高湿", 39, 27.0, ["ASTM A123 防腐", "cUPC"]),
@@ -272,103 +340,93 @@ EXTRA_STATES_CONFIG = {
     "NE": ("内布拉斯加州", "Nebraska", "美中", 11, 7, 10, "全地下室独立屋", 6200, 950, 42, 13.5, "极高", "暴风雪融雪盐", 49, 26.5, ["UL 203", "ASHRAE 70"]),
     "NV": ("内华达州", "Nevada", "美西", 21, 17, 0, "100%混凝土实心大平板(Slab)", 2800, 2600, 12, 18.0, "极低", "沙漠极端干旱酷热+极硬水", 28, 20.5, ["NSF 372 无铅涉水", "抗紫外线脆化"]),
     "NH": ("新罕布什尔州", "New Hampshire", "美东北", 17, 11, 0, "全地下室石基木屋", 7100, 450, 50, 2.5, "极高", "林区寒冬融雪盐", 48, 25.5, ["ASHRAE 70", "UL 94"]),
-    "NJ": {"cn": "新泽西州", "name": "New Jersey", "reg": "美东北", "thd": 65, "low": 40, "men": 0, "fd_str": "紧凑型地下室老房", "hdd": 4900, "cdd": 1200, "fd": 30, "wh": 6.5, "sr": "极高", "haz": "密集融雪盐腐蚀", "age": 57, "v": 27.5, "certs": ["NJ State Uniform Code", "cUPC"]},
-    "NM": {"cn": "新墨西哥州", "name": "New Mexico", "reg": "美西南", "thd": 17, "low": 13, "men": 0, "fd_str": "混凝土平板(Slab)为主", "hdd": 3800, "cdd": 1500, "fd": 18, "wh": 13.0, "sr": "低", "haz": "沙漠风沙强紫外线", "age": 36, "v": 22.5, "certs": ["NSF 372", "耐风沙磨蚀测试"]},
-    "ND": {"cn": "北达科他州", "name": "North Dakota", "reg": "美中", "thd": 4, "low": 3, "men": 8, "fd_str": "防冻深层全地下室", "hdd": 9400, "cdd": 450, "fd": 66, "wh": 13.0, "sr": "极高", "haz": "全美最高HDD极寒", "age": 45, "v": 24.5, "certs": ["IPC 305.4 超深防冻", "MSS SP-58"]},
-    "OK": {"cn": "俄克拉荷马州", "name": "Oklahoma", "reg": "美南", "thd": 21, "low": 24, "men": 0, "fd_str": "架空层与平板各半", "hdd": 3400, "cdd": 1900, "fd": 15, "wh": 11.5, "sr": "中", "haz": "龙卷风走廊风暴", "age": 40, "v": 26.0, "certs": ["FEMA P-361 避难室抗风压", "cUPC"]},
-    "OR": {"cn": "俄勒冈州", "name": "Oregon", "reg": "美西北", "thd": 27, "low": 18, "men": 0, "fd_str": "架空层木结构(Crawl)", "hdd": 4600, "cdd": 400, "fd": 12, "wh": 2.0, "sr": "低", "haz": "常年阴雨高湿霉菌", "age": 43, "v": 26.5, "certs": ["OR Energy Code", "ASTM G154 防霉"]},
-    "RI": {"cn": "罗德岛州", "name": "Rhode Island", "reg": "美东北", "thd": 7, "low": 5, "men": 0, "fd_str": "老房紧凑型地下室", "hdd": 5600, "cdd": 750, "fd": 40, "wh": 3.5, "sr": "极高", "haz": "海岸盐雾融雪盐", "age": 60, "v": 25.0, "certs": ["cUPC", "UL 94"]},
-    "SD": {"cn": "南达科他州", "name": "South Dakota", "reg": "美中", "thd": 3, "low": 3, "men": 5, "fd_str": "防冻深层地下室", "hdd": 7600, "cdd": 700, "fd": 54, "wh": 16.5, "sr": "极高", "haz": "深冻土极寒", "age": 47, "v": 25.0, "certs": ["IPC 305.4", "UL 203"]},
-    "UT": {"cn": "犹他州", "name": "Utah", "reg": "山地大区", "thd": 24, "low": 14, "men": 0, "fd_str": "大户型全地下室", "hdd": 5800, "cdd": 1050, "fd": 30, "wh": 17.5, "sr": "高", "haz": "大温差极硬水", "age": 32, "v": 25.5, "certs": ["NSF 372", "ASHRAE 70"]},
-    "VT": {"cn": "佛蒙特州", "name": "Vermont", "reg": "美东北", "thd": 5, "low": 4, "men": 0, "fd_str": "全地下室山地木屋", "hdd": 7600, "cdd": 350, "fd": 54, "wh": 4.5, "sr": "极高", "haz": "漫长积雪严寒", "age": 51, "v": 24.5, "certs": ["VT Energy Code", "UL 94"]},
-    "WY": {"cn": "怀俄明州", "name": "Wyoming", "reg": "山地大区", "thd": 5, "low": 3, "men": 2, "fd_str": "全地下室独栋", "hdd": 7500, "cdd": 350, "fd": 50, "wh": 11.0, "sr": "高", "haz": "极高海拔极寒狂风", "age": 42, "v": 23.5, "certs": ["MSS SP-58", "极温冲击测试"]}
+    "NJ": ("新泽西州", "New Jersey", "美东北", 65, 40, 0, "紧凑型地下室老房", 4900, 1200, 30, 6.5, "极高", "密集融雪盐腐蚀", 57, 27.5, ["NJ State Uniform Code", "cUPC"]),
+    "NM": ("新墨西哥州", "New Mexico", "美西南", 17, 13, 0, "混凝土实心平板(Slab)为主", 3800, 1500, 18, 13.0, "低", "沙漠风沙强紫外线", 36, 22.5, ["NSF 372", "耐风沙磨蚀测试"]),
+    "ND": ("北达科他州", "North Dakota", "美中", 4, 3, 8, "防冻深层全地下室", 9400, 450, 66, 13.0, "极高", "全美最高HDD极寒", 45, 24.5, ["IPC 305.4 超深防冻", "MSS SP-58"]),
+    "OK": ("俄克拉荷马州", "Oklahoma", "美南", 21, 24, 0, "架空层与平板各半", 3400, 1900, 15, 11.5, "中", "龙卷风走廊风暴", 40, 26.0, ["FEMA P-361 避难室抗风压", "cUPC"]),
+    "OR": ("俄勒冈州", "Oregon", "美西北", 27, 18, 0, "架空层木结构(Crawl)", 4600, 400, 12, 2.0, "低", "常年阴雨高湿霉菌", 43, 26.5, ["OR Energy Code", "ASTM G154 防霉"]),
+    "RI": ("罗德岛州", "Rhode Island", "美东北", 7, 5, 0, "老房紧凑型地下室", 5600, 750, 40, 3.5, "极高", "海岸盐雾融雪盐", 60, 25.0, ["cUPC", "UL 94"]),
+    "SD": ("南达科他州", "South Dakota", "美中", 3, 3, 5, "防冻深层地下室", 7600, 700, 54, 16.5, "极高", "深冻土极寒", 47, 25.0, ["IPC 305.4", "UL 203"]),
+    "UT": ("犹他州", "Utah", "山地大区", 24, 14, 0, "大户型全地下室", 5800, 1050, 30, 17.5, "高", "大温差极硬水", 32, 25.5, ["NSF 372", "ASHRAE 70"]),
+    "VT": ("佛蒙特州", "Vermont", "美东北", 5, 4, 0, "全地下室山地木屋", 7600, 350, 54, 4.5, "极高", "漫长积雪严寒", 51, 24.5, ["VT Energy Code", "UL 94"]),
+    "WY": ("怀俄明州", "Wyoming", "山地大区", 5, 3, 2, "全地下室独栋", 7500, 350, 50, 11.0, "高", "极高海拔极寒狂风", 42, 23.5, ["MSS SP-58", "极温冲击测试"])
 }
 
-for k, v in EXTRA_STATES_CONFIG.items():
+for k, v in EXTRA_STATES.items():
     if k not in STATES_DATA:
-        if isinstance(v, tuple):
-            STATES_DATA[k] = {
-                "cn": v[0], "name": v[1], "region": v[2], "thd": v[3], "lowes": v[4], "menards": v[5],
-                "dc": "大区核心集散仓", "foundation": v[6], "climate": "Zone 4A/5A 大陆季风", "flooring": "实木 40%, LVP 35%, 瓷砖 15%, 地毯 10%",
-                "best": "威霖标准化出风口、装配式槽钢支架", "avoid": "非标冷门异形件",
-                "size_breakdown": "标准通用型: 4x10 (70%), 4x12 (15%), 2x12 (10%), 6x12 (5%)",
-                "channel_advice": "按大区 RDC 配送中心整托调拨备货，保持安全周转天数即可。",
-                "hdd": v[7], "cdd": v[8], "frost_depth": v[9], "water_hardness": v[10], "salt_risk": v[11],
-                "hazard": v[12], "house_age": v[13], "hazard_idx": 5, "base_vel": v[14], "state_certs": v[15]
-            }
-        else:
-            STATES_DATA[k] = {
-                "cn": v["cn"], "name": v["name"], "region": v["reg"], "thd": v["thd"], "lowes": v["low"], "menards": v["men"],
-                "dc": "大区核心集散仓", "foundation": v["fd_str"], "climate": "Zone 4A/5A 大陆季风", "flooring": "实木 40%, LVP 35%, 瓷砖 15%, 地毯 10%",
-                "best": "威霖标准化出风口、装配式槽钢支架", "avoid": "非标冷门异形件",
-                "size_breakdown": "标准通用型: 4x10 (70%), 4x12 (15%), 2x12 (10%), 6x12 (5%)",
-                "channel_advice": "按大区 RDC 配送中心整托调拨备货，保持安全周转天数即可。",
-                "hdd": v["hdd"], "cdd": v["cdd"], "frost_depth": v["fd"], "water_hardness": v["wh"], "salt_risk": v["sr"],
-                "hazard": v["haz"], "house_age": v["age"], "hazard_idx": 5, "base_vel": v["v"], "state_certs": v["certs"]
-            }
+        STATES_DATA[k] = {
+            "cn": v[0], "name": v[1], "region": v[2], "thd": v[3], "lowes": v[4], "menards": v[5],
+            "dc": "大区核心集散仓", "foundation": v[6], "climate": "Zone 4A/5A 大陆气候", "flooring": "实木 40%, LVP 35%, 瓷砖 15%, 地毯 10%",
+            "best": "威霖标准化出风口、装配式槽钢支架", "avoid": "非标冷门异形件",
+            "size_breakdown": "标准通用型: 4x10 (70%), 4x12 (15%), 2x12 (10%), 6x12 (5%)",
+            "channel_advice": "按大区 RDC 配送中心整托调拨备货，保持安全周转天数即可。",
+            "hdd": v[7], "cdd": v[8], "frost_depth": v[9], "water_hardness": v[10], "salt_risk": v[11],
+            "hazard": v[12], "house_age": v[13], "hazard_idx": 5, "base_vel": v[14], "state_certs": v[15]
+        }
 
 df_states_raw = pd.DataFrame.from_dict(STATES_DATA, orient="index")
 df_states_raw["total_stores"] = df_states_raw["thd"] + df_states_raw["lowes"] + df_states_raw["menards"]
 ALL_REGIONS = ["全部大区 (All Regions)"] + sorted(list(set(df_states_raw["region"].tolist())))
 
 # ==============================================================================
-# 5. 顶层控制器（大区、节令、渠道与四维属性）
+# 5. 顶层精致双层控制面板（消除混乱视觉）
 # ==============================================================================
-st.markdown('<div class="main-title">🏭 宁波威霖住宅设施 · 北美大零售销售决策系统</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-title">完整涵盖【威霖产线对标 + 全美50州地基与8大物理特征 + Big 3 门店网络 + 州级出口认证清单 + 买手核价到岸财务】</div>', unsafe_allow_html=True)
+st.markdown("""
+<div class="bi-header">
+    <div class="main-title">🏢 宁波威霖住宅设施 · 北美大零售销售决策系统 (Pro Edition)</div>
+    <div class="sub-title">对标威霖核心产线 | 50 州地基与工程物理测算 | 单州深度调研与对家横向对标 | 州级出口认证图谱</div>
+</div>
+""", unsafe_allow_html=True)
 
-col_cat, col_region, col_season, col_channel = st.columns([1.3, 0.9, 1.0, 1.1])
-
-with col_cat:
-    selected_cat_key = st.selectbox("1. 威霖目标产线 (Category)：", list(CATEGORY_CONFIG.keys()), format_func=lambda x: CATEGORY_CONFIG[x]["name"])
+# 顶层宏观控制排
+c1, c2, c3, c4 = st.columns([1.3, 0.9, 1.0, 1.1])
+with c1:
+    selected_cat_key = st.selectbox("📂 1. 威霖核心业务线：", list(CATEGORY_CONFIG.keys()), format_func=lambda x: CATEGORY_CONFIG[x]["name"])
     cat_cfg = CATEGORY_CONFIG[selected_cat_key]
-
-with col_region:
-    selected_region = st.selectbox("2. 目标地理大区 (Region Filter)：", ALL_REGIONS, index=0)
-
-with col_season:
-    selected_season = st.selectbox("3. 规划出货节令 (Seasonality Pulse)：", [
-        "Q1 春季复苏与翻新热潮 (Spring Refresh: 3-5月)",
-        "Q2 夏季空调制冷高峰 (Peak Cooling: 6-8月)",
-        "Q3 入冬防寒整备爆发季 (Fall Weatherization: 9-11月)",
-        "Q4 深冬极寒与防冻抢修 (Freeze Defense: 12-2月)",
+with c2:
+    selected_region = st.selectbox("🗺️ 2. 地理大区筛选：", ALL_REGIONS, index=0)
+with c3:
+    selected_season = st.selectbox("📅 3. 出货节令脉冲：", [
+        "Q1 春季复苏与翻新热潮 (3-5月)",
+        "Q2 夏季空调制冷高峰 (6-8月)",
+        "Q3 入冬防寒整备爆发季 (9-11月)",
+        "Q4 深冬极寒与防冻抢修 (12-2月)",
         "全年平销基准期 (Annual Baseline)"
     ], index=2)
-
-with col_channel:
-    selected_channel = st.selectbox("4. 目标商超零售渠道：", [
+with c4:
+    selected_channel = st.selectbox("🏬 4. 目标商超零售网络：", [
         "全部渠道综合总盘 (THD + Lowe's + Menards)",
         "The Home Depot (承包商Pro工匠第一)",
         "Lowe's (家庭DIY与软装换新偏好)",
         "Menards (中西部大区独立专营)"
     ], index=0)
 
-# 动态绑定唯一定位键，彻底规避 Streamlit 下拉框幽灵状态冲突
-st.markdown("#### 🎯 威霖制造属性与规格配置")
-f1, f2, f3, f4 = st.columns(4)
-
+# 制造与客群工法控制排
+st.markdown("#### 🎯 威霖制造工法与目标客群属性联动")
+f1, f2, f3, f4, f5 = st.columns(5)
 with f1:
     pos_opts = ["(全部位置 / All)"] + cat_cfg["positions"]
-    sel_pos_raw = st.selectbox("1. 安装位置 (Position)：", pos_opts, index=1, key=f"{selected_cat_key}_pos")
-    sel_pos = sel_pos_raw.split(" ")[0]
-
+    sel_pos = st.selectbox("位置形态：", pos_opts, index=1, key=f"{selected_cat_key}_pos").split(" ")[0]
 with f2:
     mat_opts = ["(全部材质 / All)"] + cat_cfg["materials"]
-    sel_mat_raw = st.selectbox("2. 生产原材料 (Material)：", mat_opts, index=0, key=f"{selected_cat_key}_mat")
-    sel_mat = sel_mat_raw.split(" ")[0]
-
+    sel_mat = st.selectbox("原材料构件：", mat_opts, index=0, key=f"{selected_cat_key}_mat").split(" ")[0]
 with f3:
     fin_opts = ["(全部工艺 / All)"] + cat_cfg["finishes"]
-    sel_fin_raw = st.selectbox("3. 表面工艺与颜色 (Finish)：", fin_opts, index=0, key=f"{selected_cat_key}_fin")
-    sel_fin = sel_fin_raw.split(" ")[0]
-
+    sel_fin = st.selectbox("表面工艺/防腐：", fin_opts, index=0, key=f"{selected_cat_key}_fin").split(" ")[0]
 with f4:
     size_opts = ["(全部尺寸 / All)"] + cat_cfg["sizes"]
-    sel_size_raw = st.selectbox("4. 规格尺寸 (Size)：", size_opts, index=1, key=f"{selected_cat_key}_size")
-    sel_size = sel_size_raw.split(" ")[0]
+    sel_size = st.selectbox("规格尺寸：", size_opts, index=1, key=f"{selected_cat_key}_size").split(" ")[0]
+with f5:
+    sel_persona = st.selectbox("👥 核心客群定位：", [
+        "全客群综合基准",
+        "DIY 个人散客 (重彩盒与自装图解)",
+        "DIFM 改善型中产 (高客单/PVD/极简)",
+        "Pro 专业工匠 (Contractor Pack/西语)",
+        "B2B 物业房东 (ADA合规/极致性价比)"
+    ], index=0)
 
 # ==============================================================================
-# 6. 计算引擎（彻底支持“(全选)”模式，杜绝假死）
+# 6. 计算引擎
 # ==============================================================================
 calc_rows = []
 
@@ -377,7 +435,7 @@ for abbr, s in STATES_DATA.items():
     weight = 1.0
     reasons = []
     
-    # 1. 地基与安装位置逻辑 (全面支持全选与单选)
+    # 1. 地基与结构逻辑
     if selected_cat_key == "HVAC":
         if sel_pos == "Floor":
             if "地下室" in s["foundation"] or "架空" in s["foundation"]:
@@ -397,10 +455,6 @@ for abbr, s in STATES_DATA.items():
             if s["house_age"] >= 50 or abbr in ["PA", "NY", "MA", "CT", "OH", "NJ"]:
                 weight *= 1.9
                 reasons.append("老宅水暖踢脚线与狭窄缝隙换新改装需求极高")
-        elif sel_pos.startswith("(全部"):
-            if "地下室" in s["foundation"] and s["hdd"] >= 4000:
-                weight *= 1.15
-                reasons.append("采暖大区综合需求旺盛，地面与踢脚线出风口均衡出货")
 
     elif selected_cat_key == "PLUMBING":
         if "Linear" in sel_pos or "Tile-in" in sel_pos:
@@ -444,7 +498,7 @@ for abbr, s in STATES_DATA.items():
                 weight *= 2.4
                 reasons.append("热带强降雨及多泳池庭院普及，车道防内涝倒灌依赖线性深沟")
 
-    # 2. 融雪盐与水质硬度物理微调
+    # 2. 融雪盐与水质硬度
     if s["salt_risk"] in ["高", "极高"]:
         if sel_mat in ["Steel", "Carbon"]:
             weight *= 0.8
@@ -454,37 +508,32 @@ for abbr, s in STATES_DATA.items():
             reasons.append("✅ 阳极氧化铝/热镀锌耐融雪盐侵蚀，大湖雪带好评度高")
 
     if s["water_hardness"] >= 13.0 and selected_cat_key == "PLUMBING":
-        if sel_fin == "CP":
+        if sel_fin == "Polished":
             weight *= 0.85
             reasons.append("⚠️ 极重度硬水，抛光亮铬表面极易结顽固白斑水垢")
-        elif sel_fin in ["BN", "MB", "BG"]:
+        elif sel_fin in ["Brushed", "Matte", "PVD"]:
             weight *= 1.25
             reasons.append("✅ 拉丝镍/PVD工艺在硬水区抗水垢残留表现优异")
 
-    # 3. 房龄加权
+    # 3. 房龄与节令加权
     if s["house_age"] >= 50:
         weight *= 1.2
         reasons.append(f"中位房龄达 {s['house_age']} 年，老旧建筑二次翻新动销活跃")
 
-    # 4. 季节节令脉冲加权
-    if "Q3" in selected_season:
-        if selected_cat_key in ["SHOWER_HARDWARE", "HVAC"]:
-            weight *= 1.4
-            reasons.append("🍂 处于入冬防寒整备季（Fall Weatherization），销量脉冲式激增")
-    elif "Q2" in selected_season:
-        if selected_cat_key == "HVAC" and sel_pos == "Ceiling":
-            weight *= 1.7
-            reasons.append("☀️ 酷暑制冷峰值，天花散流器换新需求强劲")
-    elif "Q4" in selected_season:
-        if selected_cat_key == "PLUMBING" and "Frost" in sel_pos:
-            weight *= 2.2
-            reasons.append("❄️ 极寒深度冰封，爆管抢修更换进入最高峰")
+    if "Q3" in selected_season and selected_cat_key in ["SHOWER_HARDWARE", "HVAC"]:
+        weight *= 1.4
+        reasons.append("🍂 处于入冬防寒整备季（Fall Weatherization），销量脉冲式激增")
+    elif "Q2" in selected_season and selected_cat_key == "HVAC" and sel_pos == "Ceiling":
+        weight *= 1.7
+        reasons.append("☀️ 酷暑制冷峰值，天花散流器换新需求强劲")
+    elif "Q4" in selected_season and selected_cat_key == "PLUMBING" and "Frost" in sel_pos:
+        weight *= 2.2
+        reasons.append("❄️ 极寒深度冰封，爆管抢修更换进入最高峰")
 
-    # 5. 走量规格加成
-    if sel_size in ["04X10", "36", "4x4", "39", "1-5/8"]:
+    if sel_size in ["04X10", "36", "24-36", "1-5/8", "39"]:
         weight *= 1.15
 
-    # 渠道有效门店过滤
+    # 渠道门店数
     if "Home Depot" in selected_channel:
         active_stores = s["thd"]
     elif "Lowe's" in selected_channel:
@@ -497,6 +546,9 @@ for abbr, s in STATES_DATA.items():
     calc_vel = max(round(base_v * weight, 1), 3.0)
     calc_tot = int(calc_vel * active_stores)
     
+    # 核心单周指标计算 (UPSW: Units Per Store Per Week)
+    upsw = round(calc_vel / 4.33, 1)
+    
     tier_str = "Tier 1 (S级核心)" if calc_vel >= 38.0 else ("Tier 2 (A级主力)" if calc_vel >= 26.0 else ("Tier 3 (B级走量)" if calc_vel >= 14.0 else "Tier 4 (受限/避坑)"))
     pog = "🔥 双排面 (Double, 24寸)" if calc_vel >= 35.0 else ("✅ 单排面 (Single, 12寸)" if calc_vel >= 15.0 else "⚠️ 底层冷门位")
 
@@ -504,6 +556,7 @@ for abbr, s in STATES_DATA.items():
     row_data["abbr"] = abbr
     row_data["calc_vel"] = calc_vel
     row_data["calc_tot"] = calc_tot
+    row_data["upsw"] = upsw
     row_data["active_stores"] = active_stores
     row_data["tier"] = tier_str
     row_data["pog"] = pog
@@ -514,7 +567,6 @@ for abbr, s in STATES_DATA.items():
 
 df_all = pd.DataFrame(calc_rows)
 
-# 执行大区筛选
 if selected_region != "全部大区 (All Regions)":
     df_res = df_all[df_all["region"] == selected_region].copy()
 else:
@@ -522,15 +574,12 @@ else:
 
 df_res["rank_vel"] = df_res["calc_vel"].rank(ascending=False, method="min").astype(int)
 df_res["rank_tot"] = df_res["calc_tot"].rank(ascending=False, method="min").astype(int)
-
-# 统一排序表供全局调用
 df_sorted = df_res.sort_values("calc_tot", ascending=False).reset_index(drop=True)
 df_sorted["序号"] = df_sorted.index + 1
 
 # ==============================================================================
-# 7. 全网大卡片看板 (KPI Dashboard)
+# 7. 全网四大核心 KPI 看板
 # ==============================================================================
-st.markdown("---")
 sum_stores = int(df_res["active_stores"].sum())
 sum_units = int(df_res["calc_tot"].sum())
 top_v_row = df_res.sort_values("calc_vel", ascending=False).iloc[0]
@@ -554,37 +603,40 @@ with k2:
 with k3:
     st.markdown(f"""
     <div class="kpi-card">
-        <div class="kpi-title">单店流速冠军 (平效之王)</div>
-        <div class="kpi-val">{top_v_row['cn']} ({top_v_row['calc_vel']:.1f} 件/店)</div>
+        <div class="kpi-title">单店月流速冠军 (平效之王)</div>
+        <div class="kpi-val">{top_v_row['cn']} ({top_v_row['calc_vel']:.1f} 件/月)</div>
     </div>
     """, unsafe_allow_html=True)
 with k4:
     st.markdown(f"""
     <div class="kpi-card">
         <div class="kpi-title">渠道总吞吐量霸主 (排产核心)</div>
-        <div class="kpi-val">{top_t_row['cn']} ({top_t_row['calc_tot']:,} 件)</div>
+        <div class="kpi-val">{top_t_row['cn']} ({top_t_row['calc_tot']:,} 件/月)</div>
     </div>
     """, unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
 
 # ==============================================================================
-# 8. 四大功能 Tab 呈现
+# 8. 五大结构化职能选项卡（Tabs）
 # ==============================================================================
-tab_rank, tab_detail, tab_chart, tab_supply = st.tabs([
-    "📋 全美各州零售排行看板", 
-    "🔍 威霖单州深度透视与出口认证清单", 
-    "📊 Big 3 零售巨头渠道吞吐量图表", 
-    "🚚 供应链港口物流、打托与商超标准"
+tab_rank, tab_deepdive, tab_persona, tab_channel, tab_cert = st.tabs([
+    "📋 全美零售排行大盘",
+    "🎯 威霖单州全景深度调研与对家横向对标",
+    "👥 客户人居习性与买家画像透视",
+    "📊 Big 3 零售格局与海运分仓",
+    "📜 威霖出海认证与法规红线雷达"
 ])
 
-# ----------------- TAB 1: 排行榜看板 -----------------
+# ----------------- TAB 1: 全美排行榜 -----------------
 with tab_rank:
-    view_mode = st.radio(
-        "切换主排序依据：", 
-        ["全州渠道总吞吐量 (件/月) - 适于威霖工厂海运整柜排产", "单店平均销售流速 (件/店/月) - 适于商超平效谈判与货架位申请"], 
-        horizontal=True
-    )
+    v_col1, v_col2 = st.columns([1.2, 1])
+    with v_col1:
+        view_mode = st.radio(
+            "选择排行榜主排序维度：",
+            ["全州渠道月总吞吐量 (件/月) - 适于工厂排产总盘计划", "单店平均月销售流速 (件/店/月) - 适于商超平效谈判与货架位申请"],
+            horizontal=True
+        )
     
     if "单店" in view_mode:
         df_display = df_res.sort_values("rank_vel", ascending=True).reset_index(drop=True)
@@ -596,106 +648,145 @@ with tab_rank:
     
     st.dataframe(
         df_display[[
-            "序号", "abbr", "cn", "region", "tier", "calc_vel", "calc_tot", "calc_rev_msrp",
-            "active_stores", "house_age", "pog", "foundation"
+            "序号", "abbr", "cn", "region", "tier", "calc_vel", "upsw", "calc_tot", "calc_rev_msrp",
+            "active_stores", "pog", "foundation"
         ]],
         use_container_width=True,
         column_config={
             "序号": st.column_config.NumberColumn(width=45),
-            "abbr": st.column_config.TextColumn("简称", width=55),
+            "abbr": st.column_config.TextColumn("州标", width=55),
             "cn": st.column_config.TextColumn("州全称", width=95),
             "region": st.column_config.TextColumn("大区", width=80),
             "tier": st.column_config.TextColumn("战略梯队", width=110),
-            "calc_vel": st.column_config.ProgressColumn("单店流速(件/店)", min_value=0, max_value=max_vel_val, format="%.1f"),
+            "calc_vel": st.column_config.ProgressColumn("单店月流速", min_value=0, max_value=max_vel_val, format="%.1f 件"),
+            "upsw": st.column_config.NumberColumn("单店周流速(UPSW)", format="%.1f 件/周"),
             "calc_tot": st.column_config.NumberColumn("月总盘(件)", format="%d"),
             "calc_rev_msrp": st.column_config.NumberColumn("月零售流水($)", format="$%d"),
             "active_stores": st.column_config.NumberColumn("有效门店", width=70),
-            "house_age": st.column_config.NumberColumn("房龄", format="%d年", width=65),
             "pog": st.column_config.TextColumn("POG货架排面建议", width=140),
             "foundation": st.column_config.TextColumn("典型地基基底", width=160)
         },
-        height=540,
+        height=520,
         hide_index=True
     )
 
-# ----------------- TAB 2: 单州深度透视与认证清单 -----------------
-with tab_detail:
-    st.markdown("### 🔎 威霖对标：州级商业基底、物理气象与全美出口认证清单")
+# ----------------- TAB 2: 单州深度调研与对家对标（重构重点） -----------------
+with tab_deepdive:
+    st.markdown("### 🎯 威霖单州全景深度调研与对家（竞品）对标分析看板")
+    st.caption("穿透分析单一州的自然建筑基底、威霖产品落地可行性，并横向对标北美在售头部竞品。")
     
-    # 增加严格的越界保护
-    state_list = df_sorted["abbr"].tolist()
-    target_abbr = st.selectbox("请选择要深度穿透剖析的目标州：", state_list, index=0)
+    target_abbr = st.selectbox("👉 选择要穿透调研的目标州：", df_sorted["abbr"].tolist(), index=0)
     cur = df_sorted[df_sorted["abbr"] == target_abbr].iloc[0]
+    rival_info = cat_cfg["competitors"]
     
-    c_info1, c_info2 = st.columns([1.1, 1.1])
-    
-    with c_info1:
-        st.markdown(f"### 📍 {cur['cn']} ({cur['abbr']}) · {cur['region']} · `{cur['tier']}`")
-        m_a, m_b = st.columns(2)
-        with m_a:
-            st.metric("预估单店流速", f"{cur['calc_vel']:.1f} 件/店/月", f"当前榜单排名: #{cur['rank_vel']}")
-        with m_b:
-            st.metric("该州月总需求", f"{cur['calc_tot']:,} 件/月", f"当前榜单排名: #{cur['rank_tot']}")
-            
-        st.info(f"**💡 算法与气候地基综合归因**：\n{cur['reason_desc']}")
-        st.write(f"**🏠 房屋基底形态**：{cur['foundation']}")
-        st.write(f"**🪵 地面材质偏好**：{cur['flooring']}")
-        st.write(f"**🏬 区域门店网络**：THD: **{cur['thd']}** 家 | Lowe's: **{cur['lowes']}** 家 | Menards: **{cur['menards']}** 家 (有效覆盖: {cur['active_stores']} 家)")
-        st.write(f"**📦 POG 货架位策略**：**{cur['pog']}**")
-        st.success(f"**✅ 当地威霖对标主推品**：{cur['best']}")
-        st.warning(f"**⚠️ 当地谨慎进入品**：{cur['avoid']}")
-        
+    # 上半部：威霖在该州的基本面卡片
+    col_d1, col_d2, col_d3 = st.columns([1, 1, 1])
+    with col_d1:
         st.markdown(f"""
-        <div class="advice-box">
-            <b>📐 该州当地规格销售配比 (威霖外销装箱比例依据)：</b><br>
-            {cur['size_breakdown']}<br><br>
-            <b>💼 威霖外贸业务与商超渠道实战建议：</b><br>
-            {cur['channel_advice']}
+        <div class="section-card">
+            <span class="badge-tier1">{cur['tier']}</span>
+            <h3 style="margin:6px 0;">{cur['cn']} ({cur['abbr']})</h3>
+            <p style="font-size:0.88rem;color:#475569;">所属大区：<b>{cur['region']}</b> | 房龄：<b>{cur['house_age']}年</b></p>
+            <p>• 预估单店月流速: <b>{cur['calc_vel']:.1f}</b> 件/店/月<br>
+            • 核心周流速 (UPSW): <b>{cur['upsw']:.1f}</b> 件/店/周<br>
+            • 该州全渠道月需求: <b>{cur['calc_tot']:,}</b> 件/月</p>
+        </div>
+        """, unsafe_allow_html=True)
+    with col_d2:
+        st.markdown(f"""
+        <div class="section-card">
+            <h4 style="margin-top:0;color:#0F172A;">🏠 地基物理与环境红线</h4>
+            <p style="font-size:0.85rem;line-height:1.6;">
+            • <b>地基基底</b>: {cur['foundation']}<br>
+            • <b>地面偏好</b>: {cur['flooring']}<br>
+            • <b>能耗度日</b>: HDD {cur['hdd']:,} | CDD {cur['cdd']:,}<br>
+            • <b>法定冻土</b>: {cur['frost_depth']} 英寸<br>
+            • <b>融雪盐风险</b>: {cur['salt_risk']} | 水质硬度: {cur['water_hardness']} GPG
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+    with col_d3:
+        st.markdown(f"""
+        <div class="section-card">
+            <h4 style="margin-top:0;color:#0F172A;">🏬 渠道网点与货架位策略</h4>
+            <p style="font-size:0.85rem;line-height:1.6;">
+            • <b>商超覆盖</b>: THD: <b>{cur['thd']}</b> | Lowe's: <b>{cur['lowes']}</b> | Menards: <b>{cur['menards']}</b><br>
+            • <b>货架排面 (POG)</b>: <b>{cur['pog']}</b><br>
+            • <b>当地主推品</b>: <span style="color:#166534;">{cur['best']}</span><br>
+            • <b>当地避雷品</b>: <span style="color:#991B1B;">{cur['avoid']}</span>
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+    # 下半部：威霖 vs 对家竞品横向切片对标
+    st.markdown("#### ⚔️ 该州当前品类：威霖 (Runner) VS 北美头部对家对标")
+    
+    comp_c1, comp_c2 = st.columns(2)
+    with comp_c1:
+        st.markdown(f"""
+        <div class="competitor-card">
+            <h4 style="margin-top:0;color:#334155;">🥊 货架主要对家：{rival_info['main_rival']}</h4>
+            <p>• <b>对家排面占有率 (Shelf Share)</b>: <b>{rival_info['shelf_share']}</b><br>
+            • <b>对家零售挂牌价 (MSRP)</b>: <b>{rival_info['rival_msrp']}</b><br>
+            • <b>商超给买手留存毛利</b>: <b>{rival_info['rival_margin']}</b> (利薄，仅靠品牌拉动)<br>
+            • <b>对家核心弱点</b>: {rival_info['rival_weakness']}</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+    with comp_c2:
+        st.markdown(f"""
+        <div class="willi-card">
+            <h4 style="margin-top:0;color:#1E40AF;">🛡️ 宁波威霖 (Runner) 进攻策略与替代优势</h4>
+            <p>• <b>威霖建议零售价 (MSRP)</b>: <b>${retail_msrp:.2f}</b> (性价比优势显著)<br>
+            • <b>威霖带给买手的净毛利率</b>: <b>{buyer_margin:.1f}%</b> (留利丰厚，买手强动机换排面)<br>
+            • <b>威霖单店预估周出货 (UPSW)</b>: <b>{cur['upsw']:.1f} 件/周</b><br>
+            • <b>威霖突围战术</b>: {rival_info['willi_tactic']}</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+    # 落地指导：配比与渠道建议
+    st.markdown(f"""
+    <div class="advice-box">
+        <b>📐 该州当地规格销售装箱配比依据 (Size Breakdown)：</b><br>
+        {cur['size_breakdown']}<br><br>
+        <b>💼 威霖外贸业务员与商超买手谈盘指引 (Buyer Pitch Advice)：</b><br>
+        {cur['channel_advice']}
+    </div>
+    """, unsafe_allow_html=True)
+
+# ----------------- TAB 3: 客户人居画像透视 -----------------
+with tab_persona:
+    st.markdown("### 👥 目标州人居生活方式、买家画像与防退包装策略")
+    st.caption("针对美国家装消费者的真实生活习惯，指导外贸开发规避差评与退货。")
+    
+    p_col1, p_col2 = st.columns([1.1, 1])
+    with p_col1:
+        st.markdown("#### 1. 该州主流家装买家结构与行为")
+        # 依据所选客群展示画像
+        st.markdown(f"""
+        <div class="section-card">
+            <b>当前聚焦画像：{sel_persona}</b><br><br>
+            • <b>DIY 个人散客 (占比约 55%)</b>：周末施工，极度害怕量错尺寸（常将 4x10 开孔与 5.5x11.5 面罩混淆）。包装必须带 <b>1:1 开孔打孔定位卡纸</b> 与免螺丝自锁卡槽。<br>
+            • <b>Pro 专业工匠 (占比约 35%)</b>：早晨 6:00 进店，讲西班牙语的拉丁裔工人占 40%+。痛恨因质量差导致的二次返工（Callback）。必须提供 <b>Contractor Pack (10-20件工业包装)</b> 且外箱附带西语说明。<br>
+            • <b>DIFM 改善型中产 (占比约 10%)</b>：追求 Pinterest 流行美学，痛恨塑料踩踏异响，偏好 PVD 哑光黑与实木对齐款。
+        </div>
+        """, unsafe_allow_html=True)
+        
+    with p_col2:
+        st.markdown("#### 2. 防退货包装与出海标签指引 (Anti-Return Packaging)")
+        st.markdown(f"""
+        <div class="section-card">
+            <b>⚠️ 美国家庭“买3退2”试错退货对策：</b><br>
+            • <b>尺寸防呆</b>：外盒正反面必须以 <b>大号粗体标明 Duct Opening (管道内径)</b>，而非面罩外沿。<br>
+            • <b>双语标语</b>：南加、德州、佛州建议加印西班牙语 <i>"Fácil de instalar / Rejilla de piso"</i>。<br>
+            • <b>功能卖点标</b>：若属于高跟鞋防卡、宠物防毛、防冷凝结露设计，必须在外箱正面印制对应图示。<br>
+            • <b>防拆结构</b>：采用可二次复原的卡扣盒，避免消费者试装破损后被超市强制扣取 RTV 残损赔偿。
         </div>
         """, unsafe_allow_html=True)
 
-    with c_info2:
-        st.markdown(f"""
-        <div class="physics-card">
-            <b>🌡️ 气候物理实测与建筑工程参数</b><br>
-            • 采暖度日 (HDD): <b>{cur['hdd']:,}</b> | 制冷度日 (CDD): <b>{cur['cdd']:,}</b><br>
-            • 房屋中位房龄: <b>{cur['house_age']} 年</b> {'(⚠️ 50年以上老宅区，老规格翻新是绝对主力)' if cur['house_age']>=50 else ''}<br>
-            • 法定冻土深度: <b>{cur['frost_depth']} 英寸</b> {'(⚠️ 极深冻土，室外水阀必须≥10~12寸)' if cur['frost_depth']>=36 else ''}<br>
-            • 水质硬度: <b>{cur['water_hardness']} GPG</b> {'(⚠️ 极重度硬水，抛光亮铬易结垢)' if cur['water_hardness']>=13 else ''}<br>
-            • 融雪盐腐蚀风险: <b>{cur['salt_risk']}</b> {'(⚠️ 严禁普通冷轧铁裸露)' if cur['salt_risk'] in ['高','极高'] else ''}<br>
-            • 极端自然灾害标签: <span class="badge-tier4">{cur['hazard']} (灾害指数: {cur['hazard_idx']}/10)</span>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        # 🌟 重点扩充：标注出口该州必须通过的认证体系
-        st.markdown("#### 📜 威霖产品出口该州必查认证清单 (Certifications)")
-        
-        st.markdown("**1. 全美联邦通用强制认证 (National Baseline)：**")
-        for n_cert in cat_cfg["national_certs"]:
-            st.markdown(f'<span class="cert-badge">🏛️ {n_cert}</span>', unsafe_allow_html=True)
-            
-        st.markdown("**2. 该州/地方特有强制作法典与法规认证 (State Redlines)：**")
-        for s_cert in cur["state_certs"]:
-            st.markdown(f'<span class="cert-badge" style="background:#fee2e2;color:#991b1b;border-color:#fca5a5;">🔴 {s_cert}</span>', unsafe_allow_html=True)
-
-        st.markdown('<div class="radar-box">', unsafe_allow_html=True)
-        st.markdown("**🛡️ 威霖合规合规风控提醒：**")
-        if target_abbr == "CA":
-            st.markdown("• **加州 Prop 65** 铅迁移量与邻苯二甲酸酯检测报告必须齐全，外箱及内盒必须加印警告贴标。")
-            st.markdown("• 若推抗震支吊架，须具备 **HCAI / OSHPD** 认证；若推外墙出风口，必须满足 **WUI** 1/8 英寸防飞烬要求。")
-        elif target_abbr in ["FL", "TX"]:
-            st.markdown("• 门窗五金与户外构件若进入沿海飓风县，必须通过 **Miami-Dade NOA / TDI** 风暴冲击检验。")
-        elif cur["frost_depth"] >= 36 and selected_cat_key == "PLUMBING":
-            st.markdown(f"• 依据 **IPC 规范**，当地冻土达 {cur['frost_depth']} 寸，水暖买手一票否决常规短水龙头，必须供 8~12 寸长杆阀。")
-        else:
-            st.markdown("• 满足 cUPC / ASHRAE / UL / MSS 基础标准即可，无特殊极端地方贸易禁令。")
-        st.markdown('</div>', unsafe_allow_html=True)
-
-# ----------------- TAB 3: 零售巨头渠道图表 -----------------
-with tab_chart:
-    st.markdown("#### 📊 当前筛选区域内 Top 15 吞吐量大州 Big 3 零售渠道出货结构")
-    st.caption("注：The Home Depot 偏向工程 Pro 客户，Lowe's 偏向轻家装散客，Menards 在中西部农业大湖区统治力惊人。")
-    
+# ----------------- TAB 4: 渠道格局与港口供应链 -----------------
+with tab_channel:
+    st.markdown("#### 📊 Big 3 零售巨头渠道格局 (THD vs Lowe's vs Menards)")
     top15 = df_res.sort_values("calc_tot", ascending=False).head(15)
     chart_df = pd.DataFrame({
         "州": top15["cn"],
@@ -703,17 +794,12 @@ with tab_chart:
         "Lowe's (劳氏)": top15["calc_vel"] * top15["lowes"],
         "Menards (美纳斯)": top15["calc_vel"] * top15["menards"]
     }).set_index("州")
+    st.bar_chart(chart_df, height=360)
     
-    st.bar_chart(chart_df, height=380)
-
-# ----------------- TAB 4: 供应链、港口与打托规范 -----------------
-with tab_supply:
-    st.markdown("#### 🚚 大零售供应链 RDC 分仓配比、海运港口与包装规范")
-    
+    st.markdown("---")
+    st.markdown("#### 🚚 全美大区配送中心 (RDC) 备货比例与 GMA 打托标准")
     s_col1, s_col2 = st.columns([1.1, 1.3])
-    
     with s_col1:
-        st.markdown("##### 1. 区域配送中心 (RDC) 备货权重")
         reg_summary = df_all.groupby("region").agg({
             "abbr": "count", "active_stores": "sum", "calc_tot": "sum", "calc_vel": "mean"
         }).reset_index()
@@ -721,56 +807,64 @@ with tab_supply:
         reg_summary["建议配货比例"] = (reg_summary["月度总盘(件)"] / reg_summary["月度总盘(件)"].sum() * 100).round(1).astype(str) + "%"
         reg_summary["区均流速"] = reg_summary["区均流速"].round(1)
         st.dataframe(reg_summary, use_container_width=True, hide_index=True)
-        
     with s_col2:
-        st.markdown("##### 2. 客群画像与 GMA 打托包装建议")
-        
-        if "Cast" in sel_mat or "Hot-Dip" in sel_mat or "Carbon" in sel_mat:
-            diy_p, pro_p = 20, 80
-            pkg_rec = "Contractor Pack (10-20件无印刷牛皮纸工程包装)"
-            ret_rate = "1.5% ~ 2.0% (极低退货率)"
-        elif "Plastic" in sel_mat or "WH" in sel_fin:
-            diy_p, pro_p = 75, 25
-            pkg_rec = "彩色挂卡 / 气泡热缩膜 (配安装螺丝与 1:1 测量卡纸)"
-            ret_rate = "4.5% ~ 6.0% (中高退货率)"
-        else:
-            diy_p, pro_p = 50, 50
-            pkg_rec = "零售标准彩盒包装"
-            ret_rate = "3.0% ~ 4.0% (常规)"
-            
-        pa, pb, pc = st.columns(3)
-        with pa:
-            st.metric("DIY 散客占比", f"{diy_p}%")
-        with pb:
-            st.metric("Pro 工匠占比", f"{pro_p}%")
-        with pc:
-            st.metric("预估退货率", ret_rate)
-            
         st.markdown(f"""
         <div class="physics-card">
-            <b>📦 美标托盘 (GMA Pallet) 与包装标准：</b><br>
-            • <b>推荐装箱数</b>: {case_pack} 件/箱<br>
+            <b>📦 美标木托盘 (GMA Pallet 48×40") 打托规范：</b><br>
+            • <b>标准装箱数</b>: {case_pack} 件/箱<br>
             • <b>堆码规格 (TI/HI)</b>: 每层 6 箱 × 堆叠 8 层 = <b>48 箱/托</b><br>
-            • <b>单托装载量</b>: <b>{case_pack * 48} 件/托盘</b> (含托盘高度控在 50 英寸以内)<br>
-            • <b>外箱条码</b>: 必须打印扫描级 GS1-128 / ITF-14 箱唛，单品贴 UPC-A<br>
-            • <b>包装防退策略</b>: <span style="color:#0369a1;">{pkg_rec}</span>
+            • <b>单托总装载量</b>: <b>{case_pack * 48} 件/托盘</b> (总高度必须 ≤ 50 英寸，总重 ≤ 2000 磅)<br>
+            • <b>条码要求</b>: 外箱贴 GS1-128 / ITF-14 箱唛，单品贴 UPC-A 条形码，扫描达标率需 ≥ 99.5%。
         </div>
         """, unsafe_allow_html=True)
 
+# ----------------- TAB 5: 认证图谱与合规雷达 -----------------
+with tab_cert:
+    st.markdown("### 📜 威霖产品出海：联邦通用认证与各州极端法典清单")
+    st.caption("这是 The Home Depot 与 Lowe's 买手进行 Vendor Onboarding 时的强制核验清单。")
+    
+    cert_col1, cert_col2 = st.columns(2)
+    with cert_col1:
+        st.markdown(f"#### 🏛️ 【{cat_cfg['name'].split(' ')[0]}】全美通用强制认证")
+        for n_cert in cat_cfg["national_certs"]:
+            st.markdown(f"""
+            <div style="background:white;border:1px solid #CBD5E1;padding:10px 14px;border-radius:6px;margin-bottom:8px;">
+                <b>✓ {n_cert}</b>
+            </div>
+            """, unsafe_allow_html=True)
+            
+    with cert_col2:
+        st.markdown(f"#### 🔴 当前选中州【{cur['cn']}】地方强制法典")
+        for s_cert in cur["state_certs"]:
+            st.markdown(f"""
+            <div style="background:#FEF2F2;border:1px solid #FCA5A5;color:#991B1B;padding:10px 14px;border-radius:6px;margin-bottom:8px;">
+                <b>⚠️ 地方红线：{s_cert}</b>
+            </div>
+            """, unsafe_allow_html=True)
+            
+    st.markdown('<div class="radar-box">', unsafe_allow_html=True)
+    st.markdown(f"""
+    <b>🛡️ 威霖合规风控总备忘录：</b><br>
+    • <b>加州 Prop 65</b>：出光剂与铅析出量必须符合限量，未取得无铅报告必须加印致癌黄标，否则面临赏金律师诉讼。<br>
+    • <b>佛州与沿海 HVHZ</b>：淋浴门与户外紧固构件进入沿海区域必须具备迈阿密-戴德县 NOA 抗风暴飞弹撞击认证。<br>
+    • <b>商业管道抗震</b>：威霖装配式槽钢支吊架在西海岸必须具备 HCAI / OSHPD 预审批编号，才能参与医院学校等大型工程招投标。
+    """)
+    st.markdown('</div>', unsafe_allow_html=True)
+
 # ==============================================================================
-# 9. 决策数据一键导出 CSV
+# 9. 数据导出
 # ==============================================================================
 st.markdown("---")
 csv_out = df_sorted[[
-    "序号", "abbr", "cn", "name", "region", "tier", "calc_vel", "calc_tot", "calc_rev_msrp",
+    "序号", "abbr", "cn", "name", "region", "tier", "calc_vel", "upsw", "calc_tot", "calc_rev_msrp",
     "calc_fob_tot", "active_stores", "pog", "foundation", "flooring", "best", "avoid",
     "size_breakdown", "channel_advice", "hdd", "cdd", "frost_depth", "water_hardness",
     "salt_risk", "house_age", "hazard", "state_certs", "reason_desc"
 ]].to_csv(index=False).encode('utf-8-sig')
 
 st.download_button(
-    label=f"📥 导出【{cat_cfg['name'].split(' ')[0]}】({selected_region}) 威霖完整商业决策报表 (.csv)",
+    label=f"📥 一键导出【{cat_cfg['name'].split(' ')[0]}】({selected_region}) 威霖全景决策报表 (.csv)",
     data=csv_out,
-    file_name=f"Ningbo_Runner_Retail_Decision_{selected_cat_key}_{selected_region[:3]}.csv",
+    file_name=f"Ningbo_Runner_Intelligence_{selected_cat_key}_{selected_region[:3]}.csv",
     mime="text/csv"
 )
