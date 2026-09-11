@@ -5,40 +5,45 @@ import os
 from datetime import datetime
 
 # ==============================================================================
-# 1. 页面配置与还原截图的企业级风格
+# 1. 页面配置与还原大零售 BI 科技蓝风格
 # ==============================================================================
 st.set_page_config(
-    page_title="全美零售产品全品类与气候销售决策系统",
-    page_icon="📊",
+    page_title="全美零售全品类与气候销售决策系统",
+    page_icon="🏢",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
 st.markdown("""
 <style>
-    .main-title { font-size: 1.8rem; font-weight: 700; color: #0F172A; margin-bottom: 0.2rem; }
-    .sub-title { font-size: 0.9rem; color: #64748B; margin-bottom: 1rem; }
+    .main-title { font-size: 1.85rem; font-weight: 700; color: #0F172A; margin-bottom: 0.2rem; }
+    .sub-title { font-size: 0.92rem; color: #475569; margin-bottom: 1rem; }
     
-    /* 还原截图中的科技蓝顶部看板风格 */
-    .kpi-container { display: flex; gap: 12px; margin-bottom: 18px; }
     .kpi-card {
         background: linear-gradient(135deg, #2563EB, #1D4ED8);
         color: white;
         border-radius: 8px;
         padding: 16px 20px;
-        flex: 1;
         box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
     }
     .kpi-title { font-size: 0.88rem; opacity: 0.9; margin-bottom: 4px; font-weight: 500; }
     .kpi-val { font-size: 1.8rem; font-weight: 700; }
+    
+    .cat-selector {
+        background: #F8FAFC;
+        border: 1px solid #CBD5E1;
+        border-radius: 8px;
+        padding: 12px 18px;
+        margin-bottom: 12px;
+    }
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<div class="main-title">📊 北美大零售多品类全属性与气候销售决策系统</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-title">支持按【安装位置】、【材质】、【表面颜色代码】、【开孔尺寸】四维自由交叉筛选 | 实时联动全美各州销量流速与气候适配逻辑</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-title">🏢 北美大零售多品类全属性与气候销售决策系统</div>', unsafe_allow_html=True)
+st.markdown('<div class="sub-title">覆盖全品类家居建材（暖通通风、卫浴给排水、地面收口压条、门窗防风五金、庭院户外排水）| 实时四维属性交叉筛选与全美动销排名</div>', unsafe_allow_html=True)
 
 # ==============================================================================
-# 2. 基础数据库定义
+# 2. 全美 48 州基础数据库
 # ==============================================================================
 STATES_DATA = [
   {"abbr": "NC", "en": "North Carolina", "cn": "北卡罗来纳州", "velocity": 2946, "thd_stores": 43, "lowes_stores": 112, "foundation": "架空层/地下室(75%+)", "climate": "Zone 4A/3A 混合湿润", "best": "地面出风口、地板耐磨五金", "avoid": "易锈冷轧薄铁件", "size_breakdown": "地面绝对主力: 4x10 (65%); 换新大尺寸: 4x12 (20%); 踢脚线/狭窄区: 2x12 (10%); 回风: 6x10 (5%)", "flooring_preference": "实木 (Hardwood) 45%, 锁扣胶板 (LVP) 35%, 瓷砖 10%, 地毯 10%", "channel_advice": "Lowe's大本营核心州，THD门店流转极快，重度配置端架(Endcap)推广"},
@@ -92,58 +97,89 @@ STATES_DATA = [
 ]
 
 # ==============================================================================
-# 3. 顶部筛选器横栏（完全匹配截图选项）
+# 3. 第一层级：顶级产品大类选择 (Product Category)
 # ==============================================================================
-st.markdown("### 🎛️ 产品多维度属性筛选面板")
+CATEGORY_CONFIG = {
+    "1. 暖通通风与空气分配 (HVAC & Ventilation)": {
+        "tag": "HVAC",
+        "intro": "包括地面出风口、天花散流器、回风百叶格栅、踢脚线风口及管道连接件。核心动销受【地基形态（地下室vs平板）】和【冷热对流】决定。",
+        "positions": ["(全选)", "Floor (地面)", "Ceiling (天花板)", "Sidewall/Ceiling (侧墙/天花通用)", "Baseboard (踢脚线)"],
+        "materials": ["(全选)", "Aluminum (铝合金)", "Steel (冲压钢)", "Plastic (ABS工程树脂)", "Copper (紫铜/红铜)", "Wooden (实木)"],
+        "finishes": ["(全选)", "BL (Matte Black 哑光黑)", "BN (Brushed Nickel 拉丝镍)", "WH (White 经典白)", "DO (Dark Bronze 深古铜)", "AB (Antique Brass 仿古黄铜)", "BR (Brass 亮黄铜)", "GA (Gray 铝原灰)"],
+        "sizes": ["(全选)", "04X10", "04X12", "02X10", "02X12", "02X14", "06X10", "06X12", "08X08", "12X12"]
+    },
+    "2. 卫浴五金与地漏给排水 (Plumbing & Bath Hardware)": {
+        "tag": "PLUMBING",
+        "intro": "包括不锈钢淋浴地漏、长条线性隐形地漏、防臭下水器、防冻水阀、水槽与花洒五金配件。受【水质硬度、盐雾湿度、冻裂风险】决定。",
+        "positions": ["(全选)", "Floor Drain (地面地漏/排水口)", "Linear Drain (长条隐形线性地漏)", "Wall Mount (墙面挂件/淋浴五金)", "Frost-Proof Valve (室外防冻阀/管道构件)"],
+        "materials": ["(全选)", "Stainless Steel 304 (304不锈钢)", "Solid Brass (精铸黄铜)", "ABS/PVC (耐腐工程塑料)", "Zinc Alloy (锌合金)"],
+        "finishes": ["(全选)", "BN (Brushed Nickel 拉丝镍)", "MB (Matte Black 哑光黑)", "CP (Chrome 抛光亮铬)", "BG (Brushed Gold 拉丝金)", "ORB (Oil Rubbed Bronze 古铜)"],
+        "sizes": ["(全选)", "4x4 inch (标准方形地漏)", "6x6 inch (大排量地漏)", "24-36 inch (长条形隐形地漏)", "1/2 inch (常规进水接口)", "3/4 inch (主水管接口)"]
+    },
+    "3. 地面收口压条与瓷砖金属辅料 (Flooring & Tile Trim)": {
+        "tag": "FLOORING",
+        "intro": "包括实木/复合地板T型压条、高低过渡扣条、瓷砖防撞金属收边条、楼梯防滑包角。受【实木地板普及率 vs 瓷砖大板偏好】决定。",
+        "positions": ["(全选)", "T-Molding (同高地面平接T型条)", "Reducer (高低不平地面缓坡减速条)", "Tile Edge Trim (瓷砖L型防撞收边条)", "Stair Nosing (楼梯防滑包角踏步条)"],
+        "materials": ["(全选)", "Anodized Aluminum (阳极氧化铝合金)", "Stainless Steel (高硬度不锈钢)", "Solid Hardwood (橡木/原木)", "Flexible PVC (高弹收边条)"],
+        "finishes": ["(全选)", "Silver/Matte (哑光拉丝银)", "Titanium Black (钛黑/哑光黑)", "Champagne (香槟金)", "Dark Bronze (仿古深铜)", "Wood Grain (仿真木纹)"],
+        "sizes": ["(全选)", "36 inch (单开门标准宽)", "72 inch (双扇门大跨度)", "96 inch (工程长条)", "8mm-10mm (常规瓷砖收口)", "12mm-15mm (大理石/厚砖收口)"]
+    },
+    "4. 门窗五金与密封防风防暴 (Doors, Windows & Hardware)": {
+        "tag": "DOORS",
+        "intro": "包括门底防冷风条、门窗阻风隔音硅胶条、防飓风加固角码、重型入户门合页、推拉导轨。受【冬季寒风气密性 vs 沿海飓风防风暴标准】决定。",
+        "positions": ["(全选)", "Door Bottom Sweep (门底防风挡水刷/密封条)", "Weatherstripping (门框/窗框V型隔热密封条)", "Heavy Hinge (重型轴承门合页)", "Hurricane Tie (建筑防飓风抗风压连接件)"],
+        "materials": ["(全选)", "Aluminum + Silicone (铝合金托底+耐候硅胶)", "Heavy Duty Steel (加厚冷轧钢)", "Solid Brass (重型纯铜)", "Stainless Steel (防锈不锈钢)"],
+        "finishes": ["(全选)", "BL (Matte Black 哑光黑)", "Satin Nickel (缎面拉丝银)", "White (门框经典白)", "Zinc Galvanized (工业镀锌银)"],
+        "sizes": ["(全选)", "36 inch (标准单门底条)", "42 inch (大入户门底条)", "3.5x3.5 inch (轻型室内合页)", "4x4 inch (重载大门合页)", "50 ft Roll (50英尺整卷密封条)"]
+    },
+    "5. 户外庭院、排水沟与结构件 (Outdoor Drainage & Patio)": {
+        "tag": "OUTDOOR",
+        "intro": "包括室外车道/泳池周边排水沟、排水沟盖板、屋檐落水管防落叶过滤网、凉亭立柱防腐底座。受【暴雨洪水降雨量、融雪负荷与强紫外线】决定。",
+        "positions": ["(全选)", "Trench/Channel Drain (车道/泳池线性排水沟与格栅)", "Gutter Guard (屋檐排水天沟防叶滤网)", "Post Anchor Base (木亭地台立柱固定底座)", "Outdoor Wall Vent (室外防风雨冲压百叶)"],
+        "materials": ["(全选)", "Hot-Dip Galvanized (热浸镀锌重钢)", "Polymer/HDPE (耐暴晒耐候塑料)", "Ductile Cast Iron (重载球墨铸铁)", "Cast Aluminum (耐候防腐铸铝)"],
+        "finishes": ["(全选)", "Galvanized Silver (热镀锌防腐银)", "Black Asphalt (沥青防腐黑漆)", "Natural Cement Gray (水泥灰)"],
+        "sizes": ["(全选)", "39 inch / 1 Meter (1米标准排水沟单元)", "4x4 inch (木方柱底座)", "6x6 inch (重型大立柱底座)", "5-6 inch (全美标准屋檐排水天沟网)"]
+    }
+}
 
+st.markdown('<div class="cat-selector">', unsafe_allow_html=True)
+c_sel, c_desc = st.columns(2)
+with c_sel:
+    chosen_cat_name = st.selectbox(
+        "📂 请选择您的核心产品品类：",
+        list(CATEGORY_CONFIG.keys()),
+        index=0
+    )
+cur_cat_conf = CATEGORY_CONFIG[chosen_cat_name]
+with c_desc:
+    st.markdown(f"**品类应用画像**：{cur_cat_conf['intro']}")
+st.markdown('</div>', unsafe_allow_html=True)
+
+# ==============================================================================
+# 4. 第二层级：与当前品类动态绑定的四大属性筛选栏 (完全匹配截图体验)
+# ==============================================================================
 f_col1, f_col2, f_col3, f_col4 = st.columns(4)
 
 with f_col1:
-    pos_options = ["(全选)", "Floor (地面)", "Ceiling (天花板)", "Sidewall/Ceiling (侧墙/天花)", "Baseboard (踢脚线)"]
-    selected_pos_raw = st.selectbox("1. 安装类型 (Position)：", pos_options, index=0)
+    selected_pos_raw = st.selectbox("1. 安装类型 (Position)：", cur_cat_conf["positions"], index=0)
     sel_pos = selected_pos_raw.split(" ")[0]
 
 with f_col2:
-    mat_options = ["(全选)", "Aluminum (铝合金)", "Steel (冲压钢)", "Plastic (ABS工程树脂)", "Copper (紫铜/红铜)", "Wooden (实木)"]
-    selected_mat_raw = st.selectbox("2. 材质 (Material)：", mat_options, index=0)
+    selected_mat_raw = st.selectbox("2. 材质 (Material)：", cur_cat_conf["materials"], index=0)
     sel_mat = selected_mat_raw.split(" ")[0]
 
 with f_col3:
-    fin_options = [
-        "(全选)",
-        "BL (Matte Black 哑光黑)",
-        "BN (Brushed Nickel 拉丝镍)",
-        "AB (Antique Brass 仿古黄铜)",
-        "DO (Dark Oil-Rubbed Bronze 深古铜黑)",
-        "BR (Polished Brass 亮黄铜)",
-        "WH (White 经典白)",
-        "CO (Copper 亮红铜)",
-        "GA (Gray/Aluminum 铝原灰)"
-    ]
-    selected_fin_raw = st.selectbox("3. 表面颜色代码 (Finish)：", fin_options, index=0)
+    selected_fin_raw = st.selectbox("3. 表面颜色代码 (Finish)：", cur_cat_conf["finishes"], index=0)
     sel_fin = selected_fin_raw.split(" ")[0]
 
 with f_col4:
-    size_options = [
-        "(全选)",
-        "04X10 (全美大通货标杆)",
-        "04X12 (大空间高顶款)",
-        "02X10 (狭窄通道款)",
-        "02X12 (厨房橱柜踢脚线款)",
-        "02X14 (老宅修缮款)",
-        "06X10 (大风量回风款)",
-        "06X12 (商住两用强排量)",
-        "02X02 (方形小排气)",
-        "02X04 (精凑空间)",
-        "03X04 (特殊定制款)"
-    ]
-    selected_size_raw = st.selectbox("4. 开孔尺寸规格 (Size)：", size_options, index=0)
+    selected_size_raw = st.selectbox("4. 规格尺寸 (Size)：", cur_cat_conf["sizes"], index=0)
     sel_size = selected_size_raw.split(" ")[0]
 
 st.markdown("---")
 
 # ==============================================================================
-# 4. 核心跨维度地理气候联动计算引擎
+# 5. 多品类全美动销流速计算引擎
 # ==============================================================================
 calculated_states = []
 
@@ -155,87 +191,90 @@ for s in STATES_DATA:
     weight = 1.0
     reasons = []
     
-    # 1. 位置匹配逻辑 (Position Factor)
-    if sel_pos == "Floor":
-        if abbr in ["NC", "TN", "KY", "IN", "OH", "MI", "WV", "IL", "PA"]:
-            weight *= 1.05
-            reasons.append("全地下室/架空层核心主场")
-        elif abbr in ["FL", "TX", "AZ", "NV", "LA"]:
-            weight *= 0.15
-            reasons.append("水泥平板地基限制，地面无开孔管道")
-    elif sel_pos == "Ceiling":
-        if abbr in ["FL", "TX", "AZ", "NV", "CA", "GA"]:
-            weight *= 2.8
-            reasons.append("南方制冷刚需，出风口100%在天花板")
-        elif abbr in ["MI", "ND", "MN", "WI"]:
-            weight *= 0.55
-            reasons.append("北方一层主力为地板送风，天花板需求有限")
-    elif sel_pos == "Baseboard":
-        if abbr in ["PA", "NY", "MA", "CT", "OH", "NJ"]:
-            weight *= 1.7
-            reasons.append("东北部老宅水暖踢脚线与橱柜底特殊开孔密集")
-        else:
-            weight *= 0.65
-            reasons.append("现代独栋建筑较少使用踢脚线出风")
-            
-    # 2. 材质匹配逻辑 (Material Factor)
-    if sel_mat == "Plastic":
-        if abbr in ["FL", "SC", "NC", "LA", "AL", "GA"]:
-            weight *= 1.3
-            reasons.append("高盐雾湿热防锈痛点，ABS塑料绝不生锈")
-        elif abbr in ["MN", "ND", "WY"]:
-            weight *= 0.7
-            reasons.append("零下30度低温严寒，塑胶抗脆裂要求严苛")
-    elif sel_mat == "Aluminum":
-        if abbr in ["VA", "MD", "NC", "CA", "WA", "CO"]:
-            weight *= 1.25
-            reasons.append("中高端中产青睐质感，耐腐蚀且轻量化")
-    elif sel_mat == "Steel":
-        if abbr in ["KS", "NE", "MO", "OH", "IN", "IA"]:
-            weight *= 1.2
-            reasons.append("内陆干燥大陆气候，讲究承重耐踩与高性价比")
-        elif abbr in ["FL", "LA"]:
-            weight *= 0.6
-            reasons.append("沿海极高湿度，普通薄钢件极易锈蚀")
-    elif sel_mat == "Wooden":
-        if abbr in ["NC", "TN", "PA", "OH", "MI", "OR", "WA"]:
-            weight *= 1.35
-            reasons.append("高比例实木地板铺装，木质风口与地板浑然一体")
-        elif abbr in ["FL", "AZ", "NV"]:
-            weight *= 0.3
-            reasons.append("南方以瓷砖或水泥为主，木质风口缺少匹配场景")
-            
-    # 3. 颜色代码匹配逻辑 (Finish Factor)
-    if sel_fin == "BL":
-        if abbr in ["WA", "OR", "CA", "CO", "UT", "NC"]:
-            weight *= 1.25
-            reasons.append("现代极简建筑与农场工业风首选用色")
-    elif sel_fin in ["DO", "AB", "BR"]:
-        if abbr in ["TN", "KY", "NC", "VA", "PA", "SC", "GA"]:
-            weight *= 1.2
-            reasons.append("传统美式古典与复古庄园风格高频消耗色")
-    elif sel_fin == "WH":
-        if sel_pos in ["Ceiling", "Sidewall/Ceiling"] or abbr in ["FL", "TX", "AZ"]:
-            weight *= 1.3
-            reasons.append("天花板与浅色墙面通用隐形配色")
-            
-    # 4. 尺寸匹配逻辑 (Size Factor)
-    if sel_size == "04X10":
-        weight *= 1.0
-    elif sel_size in ["04X12", "02X12"]:
-        if abbr in ["PA", "NY", "OH", "MA", "IL", "IN"]:
-            weight *= 1.35
-            reasons.append("老宅大开间与踢脚线翻新专属规格")
-        else:
-            weight *= 0.75
-            
-    calc_velocity = int(base_velocity * weight)
+    # ---------------- 场景 1: 暖通系统 ----------------
+    if cur_cat_conf["tag"] == "HVAC":
+        if sel_pos == "Floor":
+            if abbr in ["NC", "TN", "KY", "IN", "OH", "MI", "WV", "IL", "PA"]:
+                weight *= 1.05
+                reasons.append("全地下室/架空层核心主场，热风对流刚需")
+            elif abbr in ["FL", "TX", "AZ", "NV", "LA"]:
+                weight *= 0.15
+                reasons.append("水泥平板地基限制，地面无开孔风管")
+        elif sel_pos == "Ceiling":
+            if abbr in ["FL", "TX", "AZ", "NV", "CA", "GA"]:
+                weight *= 2.8
+                reasons.append("南方强空调制冷区，出风口全部在天花板")
+            elif abbr in ["MI", "ND", "MN", "WI"]:
+                weight *= 0.55
+                reasons.append("北方一层主力为地面送风")
+        elif sel_pos == "Baseboard":
+            if abbr in ["PA", "NY", "MA", "CT", "OH", "NJ"]:
+                weight *= 1.7
+                reasons.append("东北部老宅水暖踢脚线与橱柜底特殊开孔密集")
+
+    # ---------------- 场景 2: 卫浴五金与给排水 ----------------
+    elif cur_cat_conf["tag"] == "PLUMBING":
+        if sel_pos in ["Linear Drain", "Floor Drain"]:
+            if abbr in ["FL", "CA", "TX", "NC", "SC", "GA", "AZ"]:
+                weight *= 1.8
+                reasons.append("南部与西海岸瓷砖无门槛淋浴房(Curbless Shower)翻新量全美最大")
+        elif sel_pos == "Frost-Proof Valve":
+            if abbr in ["MN", "WI", "MI", "ND", "SD", "IL", "OH"]:
+                weight *= 2.5
+                reasons.append("冬季深层冻结，室外水龙头与水管防冻裂是硬性防险标准")
+            elif abbr in ["FL", "TX", "AZ"]:
+                weight *= 0.1
+                reasons.append("南部无严重冻土冰封期，防冻阀几乎无需求")
+        if "Stainless" in sel_mat or "ABS" in sel_mat:
+            if abbr in ["FL", "SC", "NC", "LA", "AL"]:
+                weight *= 1.3
+                reasons.append("沿海极高湿度与盐雾，抗腐蚀不生锈优势压倒性")
+
+    # ---------------- 场景 3: 地面收口与瓷砖辅料 ----------------
+    elif cur_cat_conf["tag"] == "FLOORING":
+        if "Tile" in sel_pos:
+            if abbr in ["FL", "TX", "AZ", "CA", "NV"]:
+                weight *= 2.4
+                reasons.append("全美瓷砖大板铺设比例最高区域，防撞收边条极高频走货")
+        elif "T-Molding" in sel_pos or "Reducer" in sel_pos:
+            if abbr in ["NC", "TN", "KY", "OH", "IN", "PA", "MI"]:
+                weight *= 1.6
+                reasons.append("全美实木与LVP复合木地板主力大本营，房间交界压条标配")
+
+    # ---------------- 场景 4: 门窗五金与防风密封 ----------------
+    elif cur_cat_conf["tag"] == "DOORS":
+        if "Sweep" in sel_pos or "Weatherstripping" in sel_pos:
+            if abbr in ["KS", "NE", "ND", "SD", "MN", "IL", "OH", "MI", "NY"]:
+                weight *= 2.0
+                reasons.append("北方极寒与大平原狂风，门底防冷风漏风是家庭节能降电费刚需")
+        elif "Hurricane" in sel_pos:
+            if abbr in ["FL", "NC", "SC", "TX", "LA", "AL"]:
+                weight *= 3.0
+                reasons.append("沿海飓风防暴风法规 (HVHZ Code) 强制要求加固件")
+
+    # ---------------- 场景 5: 户外庭院与排水 ----------------
+    elif cur_cat_conf["tag"] == "OUTDOOR":
+        if "Trench" in sel_pos or "Channel" in sel_pos:
+            if abbr in ["FL", "LA", "TX", "WA", "OR", "GA", "NC", "SC"]:
+                weight *= 2.2
+                reasons.append("高降雨量与泳池庭院普及，车道防内涝线性排水需求巨大")
+        elif "Gutter" in sel_pos:
+            if abbr in ["NC", "GA", "TN", "VA", "PA", "OH", "MI"]:
+                weight *= 1.8
+                reasons.append("森林落叶树木茂密，秋季防堵网大面积换新")
+
+    if sel_mat == "Plastic" and abbr in ["FL", "SC", "NC", "LA"]:
+        weight *= 1.15
+    if sel_fin == "BL" and abbr in ["WA", "OR", "CA", "CO", "UT", "NC"]:
+        weight *= 1.15
+        
+    calc_velocity = max(int(base_velocity * weight), 50)
     calc_total_sales = calc_velocity * total_stores
     
     item = dict(s)
     item["calc_velocity"] = calc_velocity
     item["calc_total_sales"] = calc_total_sales
-    item["reason_desc"] = "；".join(reasons) if reasons else "符合全美标准基准流速"
+    item["reason_desc"] = "；".join(reasons) if reasons else f"符合【{chosen_cat_name.split(' ')}】全美常规流速"
     calculated_states.append(item)
 
 df_res = pd.DataFrame(calculated_states)
@@ -244,7 +283,7 @@ df_sorted = df_res.sort_values(by="rank", ascending=True).reset_index(drop=True)
 df_sorted["序号"] = df_sorted.index + 1
 
 # ==============================================================================
-# 5. 还原截图样式的大卡片 KPI 看板
+# 6. 大卡片 KPI 看板 (完全还原截图样式)
 # ==============================================================================
 sum_velocity = int(df_sorted["calc_velocity"].sum())
 top_1_state = df_sorted.iloc[0]
@@ -263,7 +302,7 @@ with kpi1:
 with kpi2:
     st.markdown(f"""
     <div class="kpi-card">
-        <div class="kpi-title">当前组合·全美同期流速指数</div>
+        <div class="kpi-title">当前品类属性·同期销量流速总值</div>
         <div class="kpi-val">{sum_velocity:,}</div>
     </div>
     """, unsafe_allow_html=True)
@@ -271,7 +310,7 @@ with kpi2:
 with kpi3:
     st.markdown(f"""
     <div class="kpi-card">
-        <div class="kpi-title">最高动销榜首州</div>
+        <div class="kpi-title">该品类全国榜首州</div>
         <div class="kpi-val">{top_1_state['abbr']} ({top_1_state['calc_velocity']:,})</div>
     </div>
     """, unsafe_allow_html=True)
@@ -279,7 +318,7 @@ with kpi3:
 with kpi4:
     st.markdown(f"""
     <div class="kpi-card">
-        <div class="kpi-title">全美单店平均销能</div>
+        <div class="kpi-title">单店平均出货能力</div>
         <div class="kpi-val">{avg_vel:,} 件/店</div>
     </div>
     """, unsafe_allow_html=True)
@@ -287,42 +326,41 @@ with kpi4:
 st.markdown("<br>", unsafe_allow_html=True)
 
 # ==============================================================================
-# 6. 数据结果展示：排行大表与单州详情
+# 7. 排行状况大表与深度下钻透视 (完全还原截图列表)
 # ==============================================================================
 col_table, col_detail = st.columns(2)
 
 with col_table:
     st.markdown("#### 📋 全美各州【同期销量/铺店数】排行状况")
-    st.caption("与商超后台报表完全一致的排名表：实时随上方【位置/材质/颜色/尺寸】动态重排")
+    st.caption("与截图一致的零售报表：根据上方所选【品类+四维属性】实时全美重排")
     
     view_table = df_sorted[["序号", "abbr", "cn", "calc_velocity", "thd_stores", "lowes_stores", "climate"]]
     view_table.columns = ["序号", "州简称", "中文全名", "同期销量/铺店数", "THD门店", "Lowe's门店", "气候带"]
-    st.dataframe(view_table, height=520, use_container_width=True)
+    st.dataframe(view_table, height=540, use_container_width=True)
 
 with col_detail:
-    st.markdown("#### 🔍 选中州在当前属性组合下的深度研判")
-    inspect_abbr = st.selectbox("选择要深入透视的州：", df_sorted["abbr"].tolist(), index=0)
+    st.markdown("#### 🔍 选中州在当前品类与属性下的深度归因")
+    inspect_abbr = st.selectbox("选择要透视的州：", df_sorted["abbr"].tolist(), index=0)
     cur = df_sorted[df_sorted["abbr"] == inspect_abbr].iloc[0]
     
     st.markdown(f"### 📌 {cur['cn']} (`{cur['abbr']}`)")
-    st.metric("该属性组合下预估单店销能", f"{cur['calc_velocity']:,} 件/店", f"全美排名: 第 {cur['序号']} 名")
+    st.metric("该品类组合下单店预估流速", f"{cur['calc_velocity']:,} 件/店", f"全美排名: 第 {cur['序号']} 名")
     
-    st.info(f"**💡 算法归因分析**：\n{cur['reason_desc']}")
-    st.write(f"**🏠 房屋构造**：{cur['foundation']}")
-    st.write(f"**🌡️ 当地气候**：{cur['climate']}")
+    st.info(f"**💡 算法与气候归因**：\n{cur['reason_desc']}")
+    st.write(f"**🏠 房屋结构基底**：{cur['foundation']}")
+    st.write(f"**🌡️ 当地气象气候**：{cur['climate']}")
     st.write(f"**🪵 地面材质偏好**：{cur['flooring_preference']}")
     st.success(f"**✅ 当地常规主推**：{cur['best']}")
     st.warning(f"**⚠️ 当地规避品类**：{cur['avoid']}")
-    st.markdown(f"**🛒 零售商超渠道建议**：{cur['channel_advice']}")
 
 # ==============================================================================
-# 7. 一键下载
+# 8. 数据一键导出
 # ==============================================================================
 st.markdown("---")
 csv_out = df_sorted[["序号", "abbr", "cn", "en", "calc_velocity", "calc_total_sales", "climate", "foundation", "reason_desc"]].to_csv(index=False).encode('utf-8-sig')
 st.download_button(
-    label="📥 一键导出当前属性筛选下的全美销售数据表 (.csv)",
+    label="📥 一键导出当前品类属性筛选结果 (.csv)",
     data=csv_out,
-    file_name=f"US_Sales_Matrix_{sel_pos}_{sel_mat}_{sel_fin}_{sel_size}.csv",
+    file_name=f"US_Sales_{cur_cat_conf['tag']}_{sel_pos}_{sel_mat}_{sel_fin}.csv",
     mime="text/csv"
 )
