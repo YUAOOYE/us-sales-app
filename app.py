@@ -57,7 +57,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# 动态时间引擎，保证数据永不失效
 current_dt = datetime.now()
 curr_year = current_dt.year
 curr_month = current_dt.month
@@ -99,11 +98,11 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("### 📚 北美商超与工程实战全景词典")
     with st.expander("1. 房屋地基与对流原理 (Foundation)", expanded=False):
-        st.write("• **北方全地下室**：冻土深，开挖全地下室。暖气炉置于地下，热风自然上升，地板出风口是全美刚需。\n• **南方实心大平板 (Slab)**：地下水高，实心水泥地无风道，冷风全由天花板下吹。")
+        st.write("• **北方全地下室**：冻土深，暖气炉在地下，热风自然上升，地板出风口是全美刚需。\n• **南方实心大平板 (Slab)**：实心水泥地无风道，冷风全由天花板下吹。")
     with st.expander("2. ASHRAE 暖通与 HDD/CDD 能耗度日", expanded=False):
         st.write("• **HDD (采暖度日)**：> 5000 区域长年开暖气，出风口承受 55℃~65℃ 干燥热风，抗热变形是硬指标。\n• **CDD (制冷度日)**：> 2000 区域空调高频冷风，天花散流器防结露滴水是第一客诉源。")
     with st.expander("3. 冻土深度与融雪盐防腐红线", expanded=False):
-        st.write("• **冻土线**：北方深达 36~60 英寸，室外水阀必须选 8~12 寸超长杆。\n• **融雪盐**：鞋底盐水滴在门厅，冷轧钢 2 年锈穿，必须推 6063 阳极氧化铝或不锈钢。")
+        st.write("• **冻土线**：北方深达 36~60 英寸，室外水阀必须选 8~12 寸超长杆。\n• **融雪盐**：鞋底盐水滴在门厅，冷轧钢 2 年锈穿，必须推 6063 阳极铝或不锈钢。")
     with st.expander("4. 北美三大零售商 (Big 3) 渠道特征", expanded=False):
         st.write("• **The Home Depot**：偏向 Pro 专业承包商，重工程装与极限承重。\n• **Lowe's**：偏向家庭 DIY 散客与女性，重彩色吊卡颜值。\n• **Menards**：中西部地头蛇，主打 11% 返现 Rebate，蓝领农场主死忠渠道。")
     with st.expander("5. 商超买手合同潜规则 (Allowances)", expanded=False):
@@ -114,7 +113,7 @@ with st.sidebar:
         st.write("• **加州 Prop 65**：无铅报告齐全，否则必须贴致癌黄标。\n• **加州 Title 24 / WUI**：出风口低漏风率气密性与外墙 1/8 英寸防火防飞烬金属网。\n• **佛州 HVHZ**：迈阿密戴德县 NOA 强飓风抗冲击测试。")
 
 # ==============================================================================
-# 3. 核心品类配置与市场客观份额分配矩阵（平账数学模型基石）
+# 3. 核心品类配置与市场客观份额切片矩阵
 # ==============================================================================
 CATEGORY_CONFIG = {
     "HVAC": {
@@ -270,7 +269,7 @@ CATEGORY_CONFIG = {
 }
 
 # ==============================================================================
-# 4. 全美 50 州全字段紧凑型数据库（完整补齐佐治亚州 GA，全美 50 州无死角）
+# 4. 全美 50 州全字段紧凑型数据库（紧凑元组结构，完整包含 GA 乔治亚州）
 # ==============================================================================
 RAW_50_STATES = [
     ("NC", "北卡罗来纳州", "North Carolina", "美东南", 72, 105, 0, "夏洛特(Lowe's大本营)", "木结构架空/地下室(75%+)", "Zone 4A/3A 混合湿润", "实木 45%, LVP 35%, 瓷砖 10%", "地面出风口/实木压条", "未防锈冷轧薄铁", 3400, 1600, 12, 3.0, "中", 33, 5, 42.0, ["NC Building Code", "ASHRAE 90.1能耗"]),
@@ -294,7 +293,7 @@ RAW_50_STATES = [
     ("AZ", "亚利桑那州", "Arizona", "美西南", 58, 33, 0, "凤凰城", "100%混凝土实心大平板", "Zone 2B 纯沙漠干热长酷暑", "瓷砖 50%, 强化 30%, 地毯 20%", "天花散流器/遮阳抗晒五金", "地面出风口", 1200, 3500, 0, 16.5, "极低", 30, 3, 19.5, ["NSF 372无铅涉水", "抗UV黄变脆化测试"]),
     ("AK", "阿拉斯加州", "Alaska", "美西北", 7, 5, 0, "安克雷奇驳运仓", "永久冻土抬升/保温地基", "Zone 7/8 全美最高寒", "强化保温 50%, 实木 30%", "超耐极温五金/重载保温件", "常温薄脆塑料/冷轧铁", 10500, 0, 72, 6.0, "中", 42, 8, 25.0, ["-40℃极低温冲击测试", "耐寒橡胶密封"]),
     ("HI", "夏威夷州", "Hawaii", "美西", 7, 4, 0, "火奴鲁鲁海运仓", "火山岩/架空防潮桩", "Zone 1 强热带高盐雾高氧化", "耐水瓷砖 60%, 防水LVP 30%", "316不锈钢/纯ABS防腐件", "普通电镀件/地面风口", 0, 4200, 0, 3.0, "低", 47, 6, 18.0, ["ASTM B117盐雾1000h+(316级)", "cUPC"]),
-    ("MO", "密苏里州", "Missouri", "美中", 39, 33, 19, "圣路易斯", "传统全地下室木屋", "Zone 4A/5A 大陆季风", "LVP 40%, 实木 30%, 瓷砖 20%", "地面可调风口/管件辅料", "纯热带建材", 4800, 1400, 28, 11.0, "高", 47, 5, 27.5, ["ASHRAE 70", "MSS SP-58"]),
+    ("MO", "密西西比州", "Missouri", "美中", 39, 33, 19, "圣路易斯", "传统全地下室木屋", "Zone 4A/5A 大陆季风", "LVP 40%, 实木 30%, 瓷砖 20%", "地面可调风口/管件辅料", "纯热带建材", 4800, 1400, 28, 11.0, "高", 47, 5, 27.5, ["ASHRAE 70", "MSS SP-58"]),
     ("AL", "阿拉巴马州", "Alabama", "美东南", 29, 34, 0, "伯明翰", "平原浅架空/平原混合", "Zone 3A 亚热带湿热", "LVP 40%, 实木 30%, 瓷砖 20%", "防潮ABS风口/通用排气罩", "未保护易氧化金属", 2600, 1900, 5, 4.5, "低", 36, 4, 28.0, ["ASTM A153热镀锌", "cUPC"]),
     ("AR", "阿肯色州", "Arkansas", "美南", 15, 20, 0, "小石城", "林区架空层木屋多", "Zone 3A/4A 湿润森林", "LVP 40%, 实木 30%, 瓷砖 20%", "防潮ABS风口/平价金属件", "高价奢侈品", 3200, 1700, 10, 5.0, "低", 39, 4, 27.0, ["ASTM A123防腐", "cUPC"]),
     ("CT", "康涅狄格州", "Connecticut", "美东北", 30, 16, 0, "哈特福德", "老房地下室工程翻新多", "Zone 5A 海洋微寒多雪", "实木 45%, LVP 35%, 瓷砖 10%", "高档拉丝金属风口/精工五金", "低档粗糙塑料", 5800, 750, 42, 4.0, "极高", 59, 6, 26.0, ["CT Building Code", "UL 94阻燃"]),
@@ -337,14 +336,13 @@ for item in RAW_50_STATES:
         "water_hardness": item[16], "salt_risk": item[17],
         "house_age": item[18], "hazard_idx": item[19], "base_vel": item[20],
         "state_certs": item[21],
-        "size_breakdown_dict": {"4x10 (通用主力)": 65, "4x12 (换新大号)": 20, "2x12 (狭长缝)": 10, "6x10 (排气回风)": 5},
         "channel_advice": f"{item[7]} 直配大区，建议保持 4~6 周安全周转库存，避免商超 RDC 断货脱销。"
     }
 
 ALL_REGIONS = ["全部大区 (All Regions)"] + sorted(list(set(s["region"] for s in STATES_DATA.values())))
 
 # ==============================================================================
-# 5. 顶层控制器面板（包含两层整齐过滤栅格）
+# 5. 顶层控制器面板
 # ==============================================================================
 st.markdown(f"""
 <div class="bi-header">
@@ -401,21 +399,20 @@ with f5:
         "B2B 物业房东 (ADA合规/极致性价比)"
     ], index=0)
 
-# 全局数据交互滑块（置于 KPI 上方，确保滑块过滤后与卡片、表格 100% 严密平账）
+# 🌟 全局滑块放在 KPI 上方，实现真正的全域实时联动
 st.markdown("##### 🎚️ 全域动态数据过滤滑块 (Sliders)")
 slide_c1, slide_c2 = st.columns(2)
 with slide_c1:
-    vel_min = st.slider("过滤单店最低月流速门槛 (件/店/月)：", min_value=0.0, max_value=80.0, value=0.0, step=2.0)
+    vel_min = st.slider("过滤单店最低月流速门槛 (件/店/月)：", min_value=0.0, max_value=80.0, value=0.0, step=1.0)
 with slide_c2:
     age_min = st.slider("过滤各州中位最低房龄门槛 (年)：", min_value=20, max_value=60, value=20, step=5)
 
 # ==============================================================================
-# 6. 计算引擎（彻底落实份额切片数学平账，并激活工艺与客群加权响应）
+# 6. 计算引擎（份额切片平账 + 自适应相对分位数梯队，彻底消灭全员 Tier 4）
 # ==============================================================================
 calc_rows = []
 share_cfg = cat_cfg["share_matrix"]
 
-# 确定客群份额切片比例 (保证子集永远严格小于全集)
 pos_share = 1.0 if sel_pos.startswith("(全部") else share_cfg["positions"].get(sel_pos, 0.25)
 mat_share = 1.0 if sel_mat.startswith("(全部") else share_cfg["materials"].get(sel_mat, 0.20)
 size_share = 1.0 if sel_size.startswith("(全部") else share_cfg["sizes"].get(sel_size, 0.20)
@@ -424,15 +421,17 @@ for abbr, s in STATES_DATA.items():
     base_v = s["base_vel"]
     fit_multiplier = 1.0
     reasons = []
+    is_conflict = False
     
-    # 1. 地基与结构适销度
+    # 地基物理逻辑
     if selected_cat_key == "HVAC":
         if "地下室" in s["foundation"] and sel_pos == "Floor":
             fit_multiplier *= 1.25
             reasons.append("全地下室对流刚需，地面出风口高频走量")
         elif "平板" in s["foundation"] and sel_pos == "Floor":
-            fit_multiplier *= 0.15
-            reasons.append("水泥实心大平板地基，地面无风管开孔")
+            fit_multiplier *= 0.10
+            is_conflict = True
+            reasons.append("实心水泥大平板地基，地面无管道开孔")
         elif s["cdd"] >= 2000 and sel_pos == "Ceiling":
             fit_multiplier *= 1.35
             reasons.append("阳光带长夏制冷，天花散流器下吹是标准")
@@ -446,54 +445,47 @@ for abbr, s in STATES_DATA.items():
                 reasons.append("普通冷轧钢受融雪盐侵蚀有生锈风险")
                 
     elif selected_cat_key == "PLUMBING":
-        if sel_pos in ["Linear Drain", "Tile-in Drain"] and abbr in ["FL", "CA", "TX", "NC", "AZ"]:
+        if sel_pos in ["Linear", "Tile-in"] and abbr in ["FL", "CA", "TX", "NC", "AZ"]:
             fit_multiplier *= 1.30
             reasons.append("现代无门槛大板淋浴房翻新爆发，隐形地漏畅销")
-        elif sel_pos == "Frost-Proof Valve":
+        elif sel_pos == "Frost-Proof":
             if s["frost_depth"] >= 36:
                 fit_multiplier *= 2.50
                 reasons.append(f"冻土深达 {s['frost_depth']} 寸，超长防冻水阀是建筑强制项")
             elif s["frost_depth"] == 0:
                 fit_multiplier *= 0.05
+                is_conflict = True
                 reasons.append("无霜冻冰封，室外防冻阀需求极低")
                 
     elif selected_cat_key == "HANGERS":
-        if sel_pos in ["Strut Channel", "Seismic Hanger"] and abbr in ["CA", "WA", "OR", "AK"]:
+        if sel_pos in ["Strut", "Seismic"] and abbr in ["CA", "WA", "OR", "AK"]:
             fit_multiplier *= 2.00
             reasons.append("高烈度地震带，装配式槽钢抗震支架属于验收强制项")
             
     elif selected_cat_key == "SHOWER_HARDWARE":
-        if sel_pos == "Hurricane Tie" and abbr in ["FL", "NC", "SC", "TX", "LA", "HI"]:
+        if sel_pos == "Hurricane" and abbr in ["FL", "NC", "SC", "TX", "LA", "HI"]:
             fit_multiplier *= 3.00
             reasons.append("大西洋与海岛飓风带 (HVHZ 法规) 强制加固角码")
 
-    # 2. 🌟 表面工艺加权响应激活 (彻底消除空挂)
-    if "AF" in sel_fin:  # AF 纳米防指纹
+    # 表面工艺加权响应激活
+    if "AF" in sel_fin:
         if abbr in ["CA", "WA", "CO", "NY", "MA"]:
             fit_multiplier *= 1.20
             reasons.append("高消费科技中产区对 AF 纳米防指纹/抗污涂层支付意愿极高")
-    elif "PVD" in sel_fin:  # PVD 镀膜
+    elif "PVD" in sel_fin:
         if abbr in ["FL", "TX", "AZ", "NV", "HI"]:
             fit_multiplier *= 1.22
             reasons.append("硬水与高盐雾区偏好 PVD 终身耐磨耐腐蚀镀层")
-    elif "Hot-Dip" in sel_fin or "HDG" in sel_fin:  # 热浸镀锌
+    elif "Hot-Dip" in sel_fin or "HDG" in sel_fin:
         if s["salt_risk"] in ["高", "极高"] or abbr in ["FL", "NC", "SC", "LA", "HI"]:
             fit_multiplier *= 1.25
             reasons.append("融雪盐或近海高盐雾区，热浸镀锌 85μm 超厚防腐层备受推崇")
-    elif "Dacromet" in sel_fin:  # 达克罗
-        if s["salt_risk"] in ["高", "极高"]:
-            fit_multiplier *= 1.20
-            reasons.append("北方大湖雪带受力件，达克罗锌铝涂层无氢脆且抗融雪盐")
-    elif "Wood" in sel_fin:  # 3D 木纹
-        if "实木" in s["flooring"]:
-            fit_multiplier *= 1.18
-            reasons.append("实木与复合地板核心区，3D热转印木纹型材高匹配度")
-    elif "Clear" in sel_fin:  # 室内冷电镀锌
+    elif "Clear" in sel_fin:
         if abbr in ["FL", "HI", "LA"] and selected_cat_key in ["OUTDOOR_DRAIN", "SHOWER_HARDWARE"]:
             fit_multiplier *= 0.60
             reasons.append("⚠️ 沿海强盐雾环境严禁使用室内冷电镀蓝白锌，生锈客诉风险高")
 
-    # 3. 🌟 客群画像加权响应激活 (彻底消除空挂)
+    # 客群画像加权响应激活
     if "Pro" in sel_persona:
         if abbr in ["TX", "CA", "FL", "AZ", "NV"]:
             fit_multiplier *= 1.25
@@ -505,23 +497,19 @@ for abbr, s in STATES_DATA.items():
         if s["house_age"] >= 45 or abbr in ["WA", "CA", "CO", "NY", "MA"]:
             fit_multiplier *= 1.20
             reasons.append("高收入高房龄改善型社区，自购高端五金雇工安装比例高")
-    elif "B2B" in sel_persona:
-        if abbr in ["IL", "NY", "NJ", "GA", "TX"]:
-            fit_multiplier *= 1.18
-            reasons.append("多家庭公寓 (Multifamily) 租赁密集，房东标准化大宗采购")
 
-    # 4. 季节脉冲微调
+    # 动态季节脉冲
     if "实时自适应" in selected_season:
         if curr_month in [9, 10, 11] and selected_cat_key in ["SHOWER_HARDWARE", "HVAC"]:
             fit_multiplier *= 1.25
-        elif curr_month in [12, 1, 2] and selected_cat_key == "PLUMBING" and sel_pos == "Frost-Proof Valve":
+        elif curr_month in [12, 1, 2] and selected_cat_key == "PLUMBING" and sel_pos == "Frost-Proof":
             fit_multiplier *= 1.80
     elif "Q3" in selected_season and selected_cat_key in ["SHOWER_HARDWARE", "HVAC"]:
         fit_multiplier *= 1.20
-    elif "Q4" in selected_season and selected_cat_key == "PLUMBING" and sel_pos == "Frost-Proof Valve":
+    elif "Q4" in selected_season and selected_cat_key == "PLUMBING" and sel_pos == "Frost-Proof":
         fit_multiplier *= 1.70
 
-    # 🌟 核心平账公式：单品销量 = 大盘总基准 * 份额切片 * 区域加权 (保证子集永远严格小于全集)
+    # 平账核心计算公式：子集严格小于全集
     combined_share = pos_share * mat_share * size_share
     calc_vel = max(round(base_v * combined_share * fit_multiplier, 1), 0.5)
     
@@ -537,17 +525,13 @@ for abbr, s in STATES_DATA.items():
 
     calc_tot = int(calc_vel * active_stores)
     upsw = round(calc_vel / 4.33, 1)
-    
-    tier_str = "Tier 1 (S级核心)" if calc_vel >= 25.0 else ("Tier 2 (A级主力)" if calc_vel >= 12.0 else ("Tier 3 (B级走量)" if calc_vel >= 4.0 else "Tier 4 (受限/避坑)"))
-    pog = "🔥 双排面 (Double 24寸)" if calc_vel >= 20.0 else ("✅ 单排面 (Single 12寸)" if calc_vel >= 8.0 else "⚠️ 底层冷门位")
 
     row_data = dict(s)
     row_data["calc_vel"] = calc_vel
     row_data["calc_tot"] = calc_tot
     row_data["upsw"] = upsw
     row_data["active_stores"] = active_stores
-    row_data["tier"] = tier_str
-    row_data["pog"] = pog
+    row_data["is_conflict"] = is_conflict
     row_data["calc_rev_msrp"] = calc_tot * retail_msrp
     row_data["calc_fob_tot"] = calc_tot * fob_cost
     row_data["reason_desc"] = "；".join(reasons) if reasons else "符合常规分销基线"
@@ -555,33 +539,61 @@ for abbr, s in STATES_DATA.items():
 
 df_all = pd.DataFrame(calc_rows)
 
+# 🌟 自适应相对分位数模型（彻底杜绝全员 Tier 4，梯队永远呈现健康的金字塔结构）
+q75 = df_all["calc_vel"].quantile(0.75)
+q35 = df_all["calc_vel"].quantile(0.35)
+q15 = df_all["calc_vel"].quantile(0.15)
+
+def assign_dynamic_tier(row):
+    if row["is_conflict"]:
+        return "Tier 4 (受限/避坑)"
+    if row["calc_vel"] >= q75:
+        return "Tier 1 (S级核心)"
+    elif row["calc_vel"] >= q35:
+        return "Tier 2 (A级主力)"
+    elif row["calc_vel"] >= q15:
+        return "Tier 3 (B级走量)"
+    else:
+        return "Tier 4 (受限/避坑)"
+
+df_all["tier"] = df_all.apply(assign_dynamic_tier, axis=1)
+
+def assign_dynamic_pog(row):
+    if row["tier"] == "Tier 1 (S级核心)":
+        return "🔥 双排面 (Double 24寸)"
+    elif row["tier"] == "Tier 2 (A级主力)":
+        return "✅ 单排面 (Single 12寸)"
+    elif row["tier"] == "Tier 3 (B级走量)":
+        return "📦 侧挂/下层排面 (Clip-Strip)"
+    else:
+        return "⚠️ 底层冷门位 / 避坑"
+
+df_all["pog"] = df_all.apply(assign_dynamic_pog, axis=1)
+
 # 区域过滤
 if selected_region != "全部大区 (All Regions)":
     df_res_base = df_all[df_all["region"] == selected_region].copy()
 else:
     df_res_base = df_all.copy()
 
-# 🌟 全局滑块动态过滤：在此执行过滤，保证 KPI 大卡片与下方表格 100% 绝对一致
+# 滑块过滤
 df_filtered = df_res_base[(df_res_base["calc_vel"] >= vel_min) & (df_res_base["house_age"] >= age_min)].copy()
-
-# 容错处理：若滑块筛选后无结果，兜底显示第一名
 if df_filtered.empty:
     df_filtered = df_res_base.head(1).copy()
 
-# 重新计算全局排序
 df_filtered["rank_vel"] = df_filtered["calc_vel"].rank(ascending=False, method="min").astype(int)
 df_filtered["rank_tot"] = df_filtered["calc_tot"].rank(ascending=False, method="min").astype(int)
 df_sorted = df_filtered.sort_values("calc_tot", ascending=False).reset_index(drop=True)
 df_sorted["序号"] = df_sorted.index + 1
 
 # ==============================================================================
-# 7. 全网四大核心 KPI 看板（加权平均平账，分毫不差）
+# 7. 全网四大核心 KPI 看板（加权平均严密平账，分毫不差）
 # ==============================================================================
 st.markdown("---")
 sum_stores = int(df_filtered["active_stores"].sum())
 sum_units = int(df_filtered["calc_tot"].sum())
 
-# 🌟 加权真实平均流速，严格闭环平账：加权均值 * 门店数 = 总销量
+# 🌟 加权真实平均流速，严格闭环平账：均值 * 门店数 = 总销量
 weighted_avg_vel = round(sum_units / max(sum_stores, 1), 1)
 weighted_avg_upsw = round(weighted_avg_vel / 4.33, 1)
 
@@ -613,7 +625,7 @@ with k3:
 with k4:
     st.markdown(f"""
     <div class="kpi-card">
-        <div class="kpi-title">加权单店均值基准线 (严密平账)</div>
+        <div class="kpi-title">加权单店均值基准线 (严格平账)</div>
         <div class="kpi-val">{weighted_avg_vel} 件/月 ({weighted_avg_upsw} 件/周)</div>
     </div>
     """, unsafe_allow_html=True)
@@ -679,7 +691,7 @@ with tab_rank:
         hide_index=True
     )
     
-    st.markdown("#### 📊 全美 50 州战略梯队（Tier 1 ~ 4）分布图")
+    st.markdown("#### 📊 全美 50 州战略梯队分布图 (自适应相对分位数，金字塔结构平衡)")
     tier_counts = df_all["tier"].value_counts().reset_index()
     tier_counts.columns = ["战略梯队", "州数量"]
     tier_chart = alt.Chart(tier_counts).mark_bar(color="#2563EB").encode(
@@ -701,7 +713,6 @@ with tab_deepdive:
     vel_vs_nat = round(((cur['calc_vel'] - weighted_avg_vel) / max(weighted_avg_vel, 0.01)) * 100, 1)
     vel_delta_str = f"超出大盘均值 +{vel_vs_nat}%" if vel_vs_nat >= 0 else f"低于大盘均值 {vel_vs_nat}%"
     
-    # 第一层：大盘对比与基本面 (自适应卡片)
     col_d1, col_d2, col_d3 = st.columns([1, 1.1, 1])
     with col_d1:
         st.markdown(f"""
@@ -737,9 +748,7 @@ with tab_deepdive:
         </div>
         """, unsafe_allow_html=True)
         
-    # 第二层：核心对家参数对比大表 (彻底解决截断)
     st.markdown(f"#### ⚔️ 该州当前品类：宁波威霖 (Runner) VS 北美头部对家结构化对比表")
-    
     annual_dollar_gain = int(cur["calc_vel"] * 12 * (gross_profit_unit - 4.50))
     dollar_gain_str = f"+${annual_dollar_gain:,} 美元/店/年" if annual_dollar_gain > 0 else "+$1,250 美元/店/年"
     
@@ -757,13 +766,17 @@ with tab_deepdive:
     ])
     st.dataframe(rival_df, use_container_width=True, hide_index=True)
     
-    # 第三层：横向水平条形图 (彻底修复文字旋转 90 度 Bug，正常水平视角显示)
     st.markdown("---")
     c_graph1, c_graph2 = st.columns(2)
     with c_graph1:
-        st.markdown(f"##### 📐 该州当地规格销售装配比 (Size Breakdown)")
-        st.caption("外贸业务排产配箱核心依据 (横向水平阅读，无旋转)：")
-        size_data = pd.DataFrame(list(cur["size_breakdown_dict"].items()), columns=["规格尺寸", "销售占比(%)"])
+        st.markdown(f"##### 📐 该州品类细分规格销售装配比 (Size Breakdown)")
+        st.caption("按当前所选品类动态加载规格，文字 100% 保持水平视角阅读：")
+        
+        # 🌟 动态适配当前品类的细分规格字典，彻底解决跨品类规格错位
+        curr_cat_sizes = cat_cfg["share_matrix"]["sizes"]
+        size_data = pd.DataFrame([
+            {"规格尺寸": k, "销售占比(%)": int(v * 100)} for k, v in curr_cat_sizes.items()
+        ])
         
         size_chart = alt.Chart(size_data).mark_bar(color="#2563EB").encode(
             x=alt.X("销售占比(%):Q", title="占比 (%)"),
@@ -774,10 +787,10 @@ with tab_deepdive:
         
     with c_graph2:
         st.markdown(f"##### 🌡️ 该州物理能耗度日数对比 (HDD vs CDD)")
-        st.caption("出风口向上吹还是向下吹的物理天平 (横向水平阅读，无旋转)：")
+        st.caption("出风口向上吹还是向下吹的物理天平 (文字 100% 水平正常视角)：")
         energy_data = pd.DataFrame([
-            {"指标": "🔥 采暖度日 (HDD)", "度日数": cur["hdd"]},
-            {"指标": "❄️ 制冷度日 (CDD)", "度日数": cur["cdd"]}
+            {"指标": "🔥 采暖度日 (HDD)", "度日数": int(cur["hdd"])},
+            {"指标": "❄️ 制冷度日 (CDD)", "度日数": int(cur["cdd"])}
         ])
         
         energy_chart = alt.Chart(energy_data).mark_bar(color="#0284C7").encode(
@@ -787,13 +800,14 @@ with tab_deepdive:
         ).properties(height=180)
         st.altair_chart(energy_chart, use_container_width=True)
 
-    # 第四层：单州规格装箱配比明细大盘表
+    # 动态装配排产大盘表
     st.markdown("##### 📦 该州细分规格装柜推荐配箱大盘表 (Assortment Planning)")
     assort_rows = []
-    for sz_name, sz_pct in cur["size_breakdown_dict"].items():
-        sz_month_units = int(cur["calc_tot"] * (sz_pct / 100.0))
+    for sz_name, sz_weight in curr_cat_sizes.items():
+        sz_pct = int(sz_weight * 100)
+        sz_month_units = int(cur["calc_tot"] * sz_weight)
         sz_month_cases = int(sz_month_units / max(case_pack, 1))
-        sz_40hq_cases = int(960 * (sz_pct / 100.0))
+        sz_40hq_cases = int(960 * sz_weight)
         assort_rows.append({
             "细分规格尺寸": sz_name,
             "当地需求配比": f"{sz_pct}%",
@@ -811,7 +825,6 @@ with tab_deepdive:
     </div>
     """, unsafe_allow_html=True)
     
-    # 买手谈判一页纸备忘录生成器 (Executive Pitch Deck Generator)
     with st.expander("📄 点击展开：商超买手审查谈判一页纸备忘录 (1-Page Pitch Memo)", expanded=False):
         st.markdown(f"""
         <div class="pitch-box">
@@ -822,11 +835,11 @@ with tab_deepdive:
         ================================================================================<br><br>
         1. STRATEGIC OPPORTUNITY:<br>
            - Monthly Store Demand: {cur['calc_vel']:.1f} Units/Store/Month ({cur['upsw']:.1f} UPSW).<br>
-           - Index vs. National Benchmark: {vel_delta_str} (High Growth Cluster).<br>
-           - Channel Footprint: THD ({cur['thd']} stores), Lowe's ({cur['lowes']} stores), Menards ({cur['menards']} stores).<br><br>
+           - Index vs. Benchmark: {vel_delta_str} (Strategic Cluster).<br>
+           - Channel Network: THD ({cur['thd']} stores), Lowe's ({cur['lowes']} stores), Menards ({cur['menards']} stores).<br><br>
         2. COMPETITOR REPLACEMENT ({rival_info['rival_name'].split('/')[0].strip()}):<br>
-           - Incumbent Flaw: Light-gauge steel prone to chipping & rust under salt/moisture.<br>
-           - Runner Advantage: Anodized 6063 Aluminum / PVD Green Coating with 720h+ salt spray.<br>
+           - Incumbent Weakness: Light-gauge metal vulnerable to chipping & rust under salt/moisture.<br>
+           - Runner Engineering: 6063 Aluminum / PVD Green Coating with 720h+ salt spray rating.<br>
            - Margin Expansion: Retailer margin increases from {rival_info['rival_margin']} to {buyer_margin:.1f}%.<br>
            - Dollar Contribution: Estimated net gain of {dollar_gain_str}.<br><br>
         3. FULFILLMENT & LOGISTICS:<br>
