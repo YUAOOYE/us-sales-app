@@ -213,7 +213,7 @@ with tab_search:
     st.subheader("🔍 单州详情与全景分析卡片")
     options = [f"{s['abbr']} - {s['cn']} ({s['en']})" for s in states_list]
     
-    col_sel, col_rank = st.columns()
+    col_sel, col_rank = st.columns(2)
     with col_sel:
         selected_option = st.selectbox("请选择要查询的州（支持输入州名或缩写）：", options, index=0)
         sel_abbr = selected_option.split(" - ")[0]
