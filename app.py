@@ -50,12 +50,12 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==============================================================================
-# 2. 侧边栏：买手到岸财务核算器与美国商业工程实战微百科
+# 2. 侧边栏：买手到岸财务核算器与实战微百科
 # ==============================================================================
 with st.sidebar:
     st.image("https://img.icons8.com/fluency/96/shop.png", width=60)
     st.title("商超工程决策中台")
-    st.caption("North American Retail & Climate Intelligence v6.0")
+    st.caption("North American Retail & Climate Intelligence v6.5")
     st.markdown("---")
     
     st.markdown("### 💰 买手完整到岸成本 (Landed) 与毛利试算")
@@ -65,7 +65,7 @@ with st.sidebar:
     retail_msrp = st.number_input("4. 商超建议零售价 MSRP ($/件)：", min_value=1.0, max_value=500.0, value=12.98, step=0.5)
     case_pack = st.number_input("5. 标准箱装数 (Case Pack)：", min_value=1, max_value=100, value=10, step=1)
     
-    # 财务链路计算
+    # 财务核算
     landed_cost = fob_cost * (1 + tariff_pct) + ocean_freight
     buyer_margin = ((retail_msrp - landed_cost) / retail_msrp) * 100
     gross_profit_unit = retail_msrp - landed_cost
@@ -85,8 +85,8 @@ with st.sidebar:
     st.markdown("### 📚 北美工程物理与零售实战百科")
     with st.expander("1. 地基形态：全地下室 vs 水泥大平板", expanded=False):
         st.write("""
-        * **北方/中西部（全地下室 Basement）**：冻土线深，深挖地下室。暖气炉在地下，**热空气自然向上升**，地面出风口（Floor Register）是全屋刚需。
-        * **南方阳光带（水泥实心平板 Slab）**：地下水高或地表膨胀土，直接浇筑实心水泥，**地面绝对无管道**！冷气全由阁楼天花板下吹。
+        * **北方/中西部（全地下室 Basement）**：由于冻土线深，必须深挖建地下室。暖气炉在地下，**热空气自然向上升**，地面出风口（Floor Register）是刚需。
+        * **南方阳光带（水泥实心平板 Slab）**：地下水高或地表膨胀土，直接浇筑实心混凝土，**地面绝对无风管**！冷气全由阁楼天花板下吹。
         """)
     with st.expander("2. ASHRAE 暖通与 HDD/CDD 能耗度日", expanded=False):
         st.write("""
@@ -103,7 +103,7 @@ with st.sidebar:
         """)
     with st.expander("5. POG 货架排面 (Facings) 机制", expanded=False):
         st.write("""
-        商超货架按英寸卖。单店月流速 > 15 件可争取 **Double Facings (双排面 24寸)**；月流速 < 5 件会面临下架或清仓（Discontinued）。
+        商超货架按英寸计费。单店月流速 > 15 件可争取 **Double Facings (双排面 24寸)**；月流速 < 5 件会面临下架或清仓（Discontinued）。
         """)
     with st.expander("6. 美标托盘 (GMA) 与打托规范", expanded=False):
         st.write("""
@@ -115,7 +115,7 @@ with st.sidebar:
         """)
 
 # ==============================================================================
-# 3. 核心全景数据库：全美 50 州（全字段补齐：地基 + 气候 + 门店 + 尺寸配比 + 渠道建议）
+# 3. 基础数据库：全美 50 州（全字段补齐：地基 + 气候 + 门店 + 尺寸配比 + 渠道建议）
 # ==============================================================================
 STATES_DATA = {
     "NC": {
@@ -312,7 +312,6 @@ STATES_DATA = {
     }
 }
 
-# 补齐其余州数据，确保 50 州完全覆盖
 EXTRA_STATES = {
     "AL": {"cn": "阿拉巴马州", "name": "Alabama", "reg": "美东南", "thd": 29, "low": 34, "men": 0, "dc": "伯明翰", "hdd": 2600, "cdd": 1900, "fd": 5, "wh": 4.5, "sr": "低", "haz": "雷暴", "age": 36, "v": 28.0},
     "AR": {"cn": "阿肯色州", "name": "Arkansas", "reg": "美南", "thd": 15, "low": 20, "men": 0, "dc": "小石城", "hdd": 3200, "cdd": 1700, "fd": 10, "wh": 5.0, "sr": "低", "haz": "雷暴", "age": 39, "v": 27.0},
@@ -356,12 +355,56 @@ for k, v in EXTRA_STATES.items():
 
 df_states = pd.DataFrame.from_dict(STATES_DATA, orient="index")
 df_states["total_stores"] = df_states["thd"] + df_states["lowes"] + df_states["menards"]
-
-# 提取大区列表供筛选
 ALL_REGIONS = ["全部大区 (All Regions)"] + sorted(list(set(df_states["region"].tolist())))
 
 # ==============================================================================
-# 4. 顶层控制器（完整保留：大区筛选、节令脉冲、渠道细分）
+# 4. 品类与四维属性深度定义 (⚠️ 必须置于 UI 控件调用前，彻底杜绝 NameError)
+# ==============================================================================
+CATEGORY_CONFIG = {
+    "HVAC": {
+        "name": "暖通出风口与回风系统 (Registers & Grilles)",
+        "positions": ["Floor (地面出风口)", "Ceiling (天花板散流器)", "Baseboard (踢脚线出风口)", "Sidewall (高侧墙回风格栅)"],
+        "materials": ["Steel (冲压冷轧钢)", "Aluminum (铝合金阳极氧化)", "Cast Metal (铸铝粉末喷涂)", "Plastic (ABS阻燃工程塑料)", "Wood (橡木实木嵌入)"],
+        "finishes": ["BL (Matte Black 哑光黑)", "BN (Brushed Nickel 拉丝镍)", "WH (White 经典工程白)", "AB (Antique Brass 仿古黄铜)", "ORB (Oil Rubbed Bronze 油磨青铜)"],
+        "sizes": ["04X10 (全美走量王 65%)", "04X12 (主流换新大号 20%)", "02X12 (踢脚狭长缝 10%)", "06X10 (大排风量 5%)", "12X12 (天花板方型)"],
+        "compliance": ["ASHRAE 70 (风量与噪音 NC 评级测试)", "UL 94 (塑料部件阻燃 V-0)", "Heel-Proof 细高跟鞋防卡规范 (<9.5mm)", "静态抗踩踏承重 > 300 lbs 测试"]
+    },
+    "PLUMBING": {
+        "name": "卫浴水暖与排水构件 (Drains & Plumbing)",
+        "positions": ["Floor Drain (方形地面地漏)", "Linear Drain (长条隐形淋浴地漏)", "Frost-Proof Valve (室外防冻长水阀)", "Wall Mount (墙面淋浴花洒五金)"],
+        "materials": ["Stainless 304 (304不锈钢拉丝)", "Stainless 316 (316高盐雾海洋级)", "Solid Brass (无铅锻压黄铜)", "ABS/PVC (耐腐工程塑料)"],
+        "finishes": ["BN (Brushed Nickel 经典拉丝镍)", "MB (Matte Black 现代哑光黑)", "CP (Chrome 抛光亮铬)", "BG (Brushed Gold 拉丝金)"],
+        "sizes": ["4x4 inch (标准方形地漏)", "24-36 inch (长条形隐形地漏)", "1/2 inch (常规进水接口)", "3/4 inch (主水管接口)"],
+        "compliance": ["cUPC 强制认证 (IAPMO)", "ASME A112.18.2 / CSA B125.2 (地漏通量测试)", "NSF/ANSI 61 & 372 (接触饮用水无铅安全标准)"]
+    },
+    "FLOORING": {
+        "name": "地面收口与过渡压条 (Flooring Transitions & Trim)",
+        "positions": ["T-Molding (同高平接T型条)", "Reducer (高低落差缓坡条)", "Tile Edge (瓷砖L型防崩角条)", "Stair Nosing (木楼梯踏步包角)"],
+        "materials": ["Anodized Aluminum (阳极氧化铝合金)", "Stainless Steel (高耐磨不锈钢)", "Solid Hardwood (实木贴皮/原木)", "PVC/SPC (石塑自粘条)"],
+        "finishes": ["Silver/Matte (哑光拉丝银)", "Titanium Black (现代钛黑)", "Champagne (香槟金)", "Dark Bronze (仿古深铜)"],
+        "sizes": ["36 inch (单开门标准宽)", "72 inch (双开门大跨度)", "8mm-10mm (常规瓷砖收口)", "12mm-15mm (大理石厚板收口)"],
+        "compliance": ["ADA Section 303 (轮椅无障碍过渡斜率 ≤ 1:2 防绊倒)", "ASTM C1028 (表面防滑摩擦系数)", "推车过槛抗凹陷强度测试"]
+    },
+    "DOORS": {
+        "name": "建筑门窗五金与密封防暴 (Doors & Window Hardware)",
+        "positions": ["Door Bottom Sweep (门底防风挡水密封条)", "Weatherstripping (门框隔音密封条)", "Hurricane Tie (建筑抗飓风加固角码)", "Heavy Hinge (重载轴承门合页)"],
+        "materials": ["Aluminum + Silicone (铝合金+耐候硅胶)", "Hot-Dip Galvanized (重型热浸镀锌钢)", "304 Stainless (防锈不锈钢)", "Solid Brass (重型纯铜)"],
+        "finishes": ["BL (Matte Black 哑光黑)", "Satin Nickel (缎面拉丝银)", "White (门框经典白)", "Zinc (工业镀锌银)"],
+        "sizes": ["36 inch (标准单门底条)", "42 inch (大入户门底条)", "4x4 inch (重载大门合页)", "50 ft Roll (50英尺整卷密封条)"],
+        "compliance": ["ANSI/BHMA A156.1 (100万次开合疲劳测试)", "ASTM E1886 / E1996 (迈阿密戴德县 HVHZ 抗飞弹飓风测试)", "UL 10C (90分钟防火门认证)"]
+    },
+    "OUTDOOR": {
+        "name": "户外庭院、排水沟与景观构件 (Outdoor & Drainage)",
+        "positions": ["Trench Drain (车道/泳池线性排水沟)", "Gutter Guard (屋檐排水天沟防落叶网)", "Post Anchor (木露台立柱固定底座)", "Outdoor Vent (外墙防风雨冲压罩)"],
+        "materials": ["Polymer/HDPE (耐暴晒重型塑料)", "Hot-Dip Galvanized (镀锌重钢格栅)", "Ductile Cast Iron (球墨铸铁重载盖板)", "Cast Aluminum (耐候防腐铸铝)"],
+        "finishes": ["Black Asphalt (沥青防腐黑)", "Galvanized Silver (热镀锌亮银)", "Natural Gray (水泥工程灰)"],
+        "sizes": ["39 inch / 1 Meter (标准单段沟长)", "5-6 inch (全美标准屋檐天沟网)", "4x4 inch (木方柱底座)", "6x6 inch (重载立柱底座)"],
+        "compliance": ["EN 1433 / ANSI A112.6.3 (A15行人 ~ C250车辆承重等级)", "ASTM A123 (热浸镀锌耐盐雾防腐)", "ASTM G154 (户外高强度抗紫外线黄变脆化测试)"]
+    }
+}
+
+# ==============================================================================
+# 5. 顶层控制器（大区、品类、节令、渠道联动）
 # ==============================================================================
 st.markdown('<div class="main-title">🏬 北美大零售全品类与气候销售决策系统 (Grand Unified Master)</div>', unsafe_allow_html=True)
 st.markdown('<div class="sub-title">完整涵盖【50州地基结构 + 8大气候物理(HDD/CDD/冻土/硬水/盐蚀) + 房龄分布 + Big 3 门店网络 + 买手到岸财务 + 规格配比 + 法务避坑雷达】</div>', unsafe_allow_html=True)
@@ -373,7 +416,6 @@ with col_cat:
     cat_cfg = CATEGORY_CONFIG[selected_cat_key]
 
 with col_region:
-    # 🌟 补齐用户发现缺失的“地区选择”
     selected_region = st.selectbox("2. 目标地理大区 (Region Filter)：", ALL_REGIONS, index=0)
 
 with col_season:
@@ -393,7 +435,7 @@ with col_channel:
         "Menards (中西部大区独立专营)"
     ], index=0)
 
-# 四维工程属性联动面板（补齐“(全部 / All)”选项）
+# 四维工程属性选择
 st.markdown("#### 🎯 产品四维工程属性选择")
 f1, f2, f3, f4 = st.columns(4)
 with f1:
@@ -414,7 +456,7 @@ with f4:
     sel_size = sel_size_raw.split(" ")[0]
 
 # ==============================================================================
-# 5. 全维多属性与物理气候计算引擎（含完整中文动态归因生成）
+# 6. 计算引擎
 # ==============================================================================
 calc_rows = []
 
@@ -423,7 +465,7 @@ for abbr, s in STATES_DATA.items():
     weight = 1.0
     reasons = []
     
-    # 1. 地基形态与安装位置联动
+    # 地基与安装位置
     if selected_cat_key == "HVAC":
         if sel_pos == "Floor":
             if "地下室" in s["foundation"] or "架空" in s["foundation"]:
@@ -487,7 +529,7 @@ for abbr, s in STATES_DATA.items():
                 weight *= 2.1
                 reasons.append("森林树冠茂密，秋季落叶防堵塞天沟大面积换装")
 
-    # 2. 融雪盐与水硬度物理微调
+    # 融雪盐与水硬度
     if s["salt_risk"] in ["高", "极高"]:
         if sel_mat in ["Steel"]:
             weight *= 0.8
@@ -504,12 +546,12 @@ for abbr, s in STATES_DATA.items():
             weight *= 1.25
             reasons.append("✅ 拉丝镍/哑光黑在硬水区抗水垢视觉残留表现优异")
 
-    # 3. 房龄加权
+    # 房龄加权
     if s["house_age"] >= 50:
         weight *= 1.2
         reasons.append(f"中位房龄达 {s['house_age']} 年，老旧建筑二次换新动销活跃")
 
-    # 4. 季节节令脉冲加权
+    # 节令脉冲
     if "Q3" in selected_season:
         if selected_cat_key == "DOORS" and ("Sweep" in sel_pos or "Weatherstripping" in sel_pos):
             weight *= 1.6
@@ -530,11 +572,10 @@ for abbr, s in STATES_DATA.items():
             weight *= 1.3
             reasons.append("🌱 美国春季退税到账（Tax Refund），室内翻修小阳春")
 
-    # 5. 尺寸超级通货加权
     if sel_size in ["04X10", "36", "4x4", "39"]:
         weight *= 1.15
 
-    # 计算有效门店数
+    # 渠道门店
     if "Home Depot" in selected_channel:
         active_stores = s["thd"]
     elif "Lowe's" in selected_channel:
@@ -547,7 +588,6 @@ for abbr, s in STATES_DATA.items():
     calc_vel = max(round(base_v * weight, 1), 3.0)
     calc_tot = int(calc_vel * active_stores)
     
-    # 评级等级划分 (Tier System)
     if calc_vel >= 38.0:
         tier_str = "Tier 1 (S级核心)"
     elif calc_vel >= 26.0:
@@ -557,7 +597,6 @@ for abbr, s in STATES_DATA.items():
     else:
         tier_str = "Tier 4 (受限/避坑)"
 
-    # 货架排面建议
     pog = "🔥 双排面 (Double, 24寸)" if calc_vel >= 35.0 else ("✅ 单排面 (Single, 12寸)" if calc_vel >= 15.0 else "⚠️ 底层冷门位")
 
     row_data = dict(s)
@@ -574,7 +613,6 @@ for abbr, s in STATES_DATA.items():
 
 df_all = pd.DataFrame(calc_rows)
 
-# 🌟 执行大区过滤筛选
 if selected_region != "全部大区 (All Regions)":
     df_res = df_all[df_all["region"] == selected_region].copy()
 else:
@@ -584,12 +622,11 @@ df_res["rank_vel"] = df_res["calc_vel"].rank(ascending=False, method="min").asty
 df_res["rank_tot"] = df_res["calc_tot"].rank(ascending=False, method="min").astype(int)
 
 # ==============================================================================
-# 6. 全网大卡片看板 (KPI Dashboard)
+# 7. 全网大卡片看板 (KPI Dashboard)
 # ==============================================================================
 st.markdown("---")
 sum_stores = int(df_res["active_stores"].sum())
 sum_units = int(df_res["calc_tot"].sum())
-sum_rev = df_res["calc_rev_msrp"].sum()
 top_v_row = df_res.sort_values("calc_vel", ascending=False).iloc[0]
 top_t_row = df_res.sort_values("calc_tot", ascending=False).iloc[0]
 
@@ -626,7 +663,7 @@ with k4:
 st.markdown("<br>", unsafe_allow_html=True)
 
 # ==============================================================================
-# 7. 四大核心功能 Tab 分页
+# 8. 四大核心功能 Tab 分页
 # ==============================================================================
 tab_rank, tab_detail, tab_chart, tab_supply = st.tabs([
     "📋 全美各州零售排行看板", 
@@ -675,7 +712,6 @@ with tab_rank:
 # ----------------- TAB 2: 单州深度透视 -----------------
 with tab_detail:
     st.markdown("### 🔎 目标州商业基底、物理气象与法务避坑雷达")
-    # 单州下拉框与当前大区过滤动态联动
     target_abbr = st.selectbox("请选择要深度穿透剖析的目标州：", df_sorted["abbr"].tolist(), index=0)
     cur = df_sorted[df_sorted["abbr"] == target_abbr].iloc[0]
     
@@ -697,7 +733,6 @@ with tab_detail:
         st.success(f"**✅ 当地常规主推品**：{cur['best']}")
         st.warning(f"**⚠️ 当地谨慎进入品**：{cur['avoid']}")
         
-        # 🌟 恢复买手最关心的规格配比与渠道建议
         st.markdown(f"""
         <div class="advice-box">
             <b>📐 该州当地规格销售配比 (装箱比例依据)：</b><br>
@@ -720,7 +755,6 @@ with tab_detail:
         </div>
         """, unsafe_allow_html=True)
         
-        # 法律红线与强制准入雷达
         redlines = []
         if target_abbr == "CA":
             redlines.append("加州 Proposition 65（65号提案）：含微量铅必须附带致癌黄标警告，否则面临赏金律师高额索赔。")
@@ -777,7 +811,6 @@ with tab_supply:
     with s_col2:
         st.markdown("##### 2. 客群画像与 GMA 打托包装建议")
         
-        # 动态客群画像判定
         if "Cast" in sel_mat or "Stainless 316" in sel_mat or "Hurricane" in sel_pos:
             diy_p, pro_p = 25, 75
             pkg_rec = "Contractor Pack (10-20件无印刷牛皮纸工程包装)"
@@ -811,7 +844,7 @@ with tab_supply:
         """, unsafe_allow_html=True)
 
 # ==============================================================================
-# 8. 决策数据一键导出 CSV（50州全字段完整导出）
+# 9. 决策数据一键导出 CSV
 # ==============================================================================
 st.markdown("---")
 csv_out = df_sorted[[
