@@ -2,34 +2,43 @@ import streamlit as st
 import pandas as pd
 import json
 import os
-import io
 from datetime import datetime
 
 # ==============================================================================
-# 1. 页面配置与美观样式
+# 1. 页面配置与还原截图的企业级风格
 # ==============================================================================
 st.set_page_config(
-    page_title="全美大零售官方售卖点与气候销售决策系统 (Pro 增强版)",
-    page_icon="🏬",
+    page_title="全美零售产品全品类与气候销售决策系统",
+    page_icon="📊",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 st.markdown("""
 <style>
-    .main-header { font-size: 2.1rem; font-weight: 700; color: #0F172A; margin-bottom: 0.2rem; }
-    .sub-header { font-size: 0.95rem; color: #475569; margin-bottom: 1.2rem; }
-    .season-box { background: linear-gradient(135deg, #FFFBEB, #FEF3C7); border: 1px solid #FCD34D; border-radius: 8px; padding: 14px; margin-bottom: 15px; }
-    .card-t1 { border-left: 5px solid #2563EB; background-color: #F8FAFC; padding: 16px; border-radius: 6px; margin-bottom: 12px; }
-    .card-t5 { border-left: 5px solid #EF4444; background-color: #FEF2F2; padding: 16px; border-radius: 6px; margin-bottom: 12px; }
+    .main-title { font-size: 1.8rem; font-weight: 700; color: #0F172A; margin-bottom: 0.2rem; }
+    .sub-title { font-size: 0.9rem; color: #64748B; margin-bottom: 1rem; }
+    
+    /* 还原截图中的科技蓝顶部看板风格 */
+    .kpi-container { display: flex; gap: 12px; margin-bottom: 18px; }
+    .kpi-card {
+        background: linear-gradient(135deg, #2563EB, #1D4ED8);
+        color: white;
+        border-radius: 8px;
+        padding: 16px 20px;
+        flex: 1;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    }
+    .kpi-title { font-size: 0.88rem; opacity: 0.9; margin-bottom: 4px; font-weight: 500; }
+    .kpi-val { font-size: 1.8rem; font-weight: 700; }
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<div class="main-header">🏬 全美大零售官方售卖点与气候销售决策系统</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-header">动态联动 The Home Depot & Lowe\'s 官方售卖点 | 实时在售表上传解析 | 季节供暖时钟与海运备货窗口 | 开孔规格与地材矩阵</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-title">📊 北美大零售多品类全属性与气候销售决策系统</div>', unsafe_allow_html=True)
+st.markdown('<div class="sub-title">支持按【安装位置】、【材质】、【表面颜色代码】、【开孔尺寸】四维自由交叉筛选 | 实时联动全美各州销量流速与气候适配逻辑</div>', unsafe_allow_html=True)
 
 # ==============================================================================
-# 2. 全美 48 州权威基准数据库 (含官方售卖点与规格偏好)
+# 2. 基础数据库定义
 # ==============================================================================
 STATES_DATA = [
   {"abbr": "NC", "en": "North Carolina", "cn": "北卡罗来纳州", "velocity": 2946, "thd_stores": 43, "lowes_stores": 112, "foundation": "架空层/地下室(75%+)", "climate": "Zone 4A/3A 混合湿润", "best": "地面出风口、地板耐磨五金", "avoid": "易锈冷轧薄铁件", "size_breakdown": "地面绝对主力: 4x10 (65%); 换新大尺寸: 4x12 (20%); 踢脚线/狭窄区: 2x12 (10%); 回风: 6x10 (5%)", "flooring_preference": "实木 (Hardwood) 45%, 锁扣胶板 (LVP) 35%, 瓷砖 10%, 地毯 10%", "channel_advice": "Lowe's大本营核心州，THD门店流转极快，重度配置端架(Endcap)推广"},
@@ -83,226 +92,237 @@ STATES_DATA = [
 ]
 
 # ==============================================================================
-# 3. 季节性补货时钟与海运周期模块 (Seasonality & Supply Chain Lead Time)
+# 3. 顶部筛选器横栏（完全匹配截图选项）
 # ==============================================================================
-now = datetime.now()
-curr_month = now.month
+st.markdown("### 🎛️ 产品多维度属性筛选面板")
 
-season_months = {
-    1: ("❄️ 1月·深冬高寒期", "北方极寒消耗高峰，以现货快速补仓为主；各大商超正对春季 (Spring Reset) 庭院与家装进行最终确认。"),
-    2: ("❄️ 2月·供暖尾期与春季下单月", "商超开始下发春季家装首批大单；需抓紧锁定天花板散流器、户外建材与防潮卫浴生产排期。"),
-    3: ("🌱 3月·春季翻新启动月", "南方制冷与全美地板更换全面启动；海运直发美西/美东中心仓，准备迎接复活节促销。"),
-    4: ("🌱 4月·全美春季家装大爆发", "春季大促核心月，地板与墙面旧改高峰；北方开始转暖，南方进入强空调负荷期。"),
-    5: ("☀️ 5月·初夏销售旺季", "阵亡将士纪念日促销期；防紫外线户外建材、耐高温塑料配件与防潮卫浴动销走高。"),
-    6: ("☀️ 6月·盛夏制冷与除湿峰值", "深南阳光带(FL/TX/AZ)空调制冷满负荷运转；耐盐雾、天花板出风与大滤网回风高频补货。"),
-    7: ("☀️ 7月·秋冬季暖通提报月", "各大商超采购经理（Merchant）开始锁定秋冬供暖（Fall/Winter Set）风口选品与装架图（POG）。"),
-    8: ("🍂 8月·海外工厂大排产与订舱窗口", "出运美东美中必须在本月离港！海运耗时35-45天，确保货物在10月初进抵海外零售仓。"),
-    9: ("🍁 9月·秋季供暖季备货攻坚窗口", "全美中东部与北方供暖设备启动；地面出风口、管道密封与暖通换新件第一波补货上架。"),
-    10: ("🍁 10月·严冬前翻新与黑色星期五备货", "气温断崖下跌，地下室集中供热启动；商超为黑五网一促销锁死各店安全库存（Safety Stock）。"),
-    11: ("❄️ 11月·黑五网一大促与寒潮爆发", "全美强寒潮袭击，中东部高产走廊（NC/TN/KY/OH/IN）地面出风口迎来年内出货最高峰。"),
-    12: ("❄️ 12月·冬季抢险修缮与盘点月", "极寒冻裂与管道抢修高发；高耐寒金属配件出货稳健，同时准备次年春季改款。")
-}
+f_col1, f_col2, f_col3, f_col4 = st.columns(4)
 
-season_title, season_desc = season_months.get(curr_month, season_months[9])
+with f_col1:
+    pos_options = ["(全选)", "Floor (地面)", "Ceiling (天花板)", "Sidewall/Ceiling (侧墙/天花)", "Baseboard (踢脚线)"]
+    selected_pos_raw = st.selectbox("1. 安装类型 (Position)：", pos_options, index=0)
+    sel_pos = selected_pos_raw.split(" ")[0]
 
-with st.container():
+with f_col2:
+    mat_options = ["(全选)", "Aluminum (铝合金)", "Steel (冲压钢)", "Plastic (ABS工程树脂)", "Copper (紫铜/红铜)", "Wooden (实木)"]
+    selected_mat_raw = st.selectbox("2. 材质 (Material)：", mat_options, index=0)
+    sel_mat = selected_mat_raw.split(" ")[0]
+
+with f_col3:
+    fin_options = [
+        "(全选)",
+        "BL (Matte Black 哑光黑)",
+        "BN (Brushed Nickel 拉丝镍)",
+        "AB (Antique Brass 仿古黄铜)",
+        "DO (Dark Oil-Rubbed Bronze 深古铜黑)",
+        "BR (Polished Brass 亮黄铜)",
+        "WH (White 经典白)",
+        "CO (Copper 亮红铜)",
+        "GA (Gray/Aluminum 铝原灰)"
+    ]
+    selected_fin_raw = st.selectbox("3. 表面颜色代码 (Finish)：", fin_options, index=0)
+    sel_fin = selected_fin_raw.split(" ")[0]
+
+with f_col4:
+    size_options = [
+        "(全选)",
+        "04X10 (全美大通货标杆)",
+        "04X12 (大空间高顶款)",
+        "02X10 (狭窄通道款)",
+        "02X12 (厨房橱柜踢脚线款)",
+        "02X14 (老宅修缮款)",
+        "06X10 (大风量回风款)",
+        "06X12 (商住两用强排量)",
+        "02X02 (方形小排气)",
+        "02X04 (精凑空间)",
+        "03X04 (特殊定制款)"
+    ]
+    selected_size_raw = st.selectbox("4. 开孔尺寸规格 (Size)：", size_options, index=0)
+    sel_size = selected_size_raw.split(" ")[0]
+
+st.markdown("---")
+
+# ==============================================================================
+# 4. 核心跨维度地理气候联动计算引擎
+# ==============================================================================
+calculated_states = []
+
+for s in STATES_DATA:
+    abbr = s["abbr"]
+    base_velocity = s["velocity"]
+    total_stores = s["thd_stores"] + s["lowes_stores"]
+    
+    weight = 1.0
+    reasons = []
+    
+    # 1. 位置匹配逻辑 (Position Factor)
+    if sel_pos == "Floor":
+        if abbr in ["NC", "TN", "KY", "IN", "OH", "MI", "WV", "IL", "PA"]:
+            weight *= 1.05
+            reasons.append("全地下室/架空层核心主场")
+        elif abbr in ["FL", "TX", "AZ", "NV", "LA"]:
+            weight *= 0.15
+            reasons.append("水泥平板地基限制，地面无开孔管道")
+    elif sel_pos == "Ceiling":
+        if abbr in ["FL", "TX", "AZ", "NV", "CA", "GA"]:
+            weight *= 2.8
+            reasons.append("南方制冷刚需，出风口100%在天花板")
+        elif abbr in ["MI", "ND", "MN", "WI"]:
+            weight *= 0.55
+            reasons.append("北方一层主力为地板送风，天花板需求有限")
+    elif sel_pos == "Baseboard":
+        if abbr in ["PA", "NY", "MA", "CT", "OH", "NJ"]:
+            weight *= 1.7
+            reasons.append("东北部老宅水暖踢脚线与橱柜底特殊开孔密集")
+        else:
+            weight *= 0.65
+            reasons.append("现代独栋建筑较少使用踢脚线出风")
+            
+    # 2. 材质匹配逻辑 (Material Factor)
+    if sel_mat == "Plastic":
+        if abbr in ["FL", "SC", "NC", "LA", "AL", "GA"]:
+            weight *= 1.3
+            reasons.append("高盐雾湿热防锈痛点，ABS塑料绝不生锈")
+        elif abbr in ["MN", "ND", "WY"]:
+            weight *= 0.7
+            reasons.append("零下30度低温严寒，塑胶抗脆裂要求严苛")
+    elif sel_mat == "Aluminum":
+        if abbr in ["VA", "MD", "NC", "CA", "WA", "CO"]:
+            weight *= 1.25
+            reasons.append("中高端中产青睐质感，耐腐蚀且轻量化")
+    elif sel_mat == "Steel":
+        if abbr in ["KS", "NE", "MO", "OH", "IN", "IA"]:
+            weight *= 1.2
+            reasons.append("内陆干燥大陆气候，讲究承重耐踩与高性价比")
+        elif abbr in ["FL", "LA"]:
+            weight *= 0.6
+            reasons.append("沿海极高湿度，普通薄钢件极易锈蚀")
+    elif sel_mat == "Wooden":
+        if abbr in ["NC", "TN", "PA", "OH", "MI", "OR", "WA"]:
+            weight *= 1.35
+            reasons.append("高比例实木地板铺装，木质风口与地板浑然一体")
+        elif abbr in ["FL", "AZ", "NV"]:
+            weight *= 0.3
+            reasons.append("南方以瓷砖或水泥为主，木质风口缺少匹配场景")
+            
+    # 3. 颜色代码匹配逻辑 (Finish Factor)
+    if sel_fin == "BL":
+        if abbr in ["WA", "OR", "CA", "CO", "UT", "NC"]:
+            weight *= 1.25
+            reasons.append("现代极简建筑与农场工业风首选用色")
+    elif sel_fin in ["DO", "AB", "BR"]:
+        if abbr in ["TN", "KY", "NC", "VA", "PA", "SC", "GA"]:
+            weight *= 1.2
+            reasons.append("传统美式古典与复古庄园风格高频消耗色")
+    elif sel_fin == "WH":
+        if sel_pos in ["Ceiling", "Sidewall/Ceiling"] or abbr in ["FL", "TX", "AZ"]:
+            weight *= 1.3
+            reasons.append("天花板与浅色墙面通用隐形配色")
+            
+    # 4. 尺寸匹配逻辑 (Size Factor)
+    if sel_size == "04X10":
+        weight *= 1.0
+    elif sel_size in ["04X12", "02X12"]:
+        if abbr in ["PA", "NY", "OH", "MA", "IL", "IN"]:
+            weight *= 1.35
+            reasons.append("老宅大开间与踢脚线翻新专属规格")
+        else:
+            weight *= 0.75
+            
+    calc_velocity = int(base_velocity * weight)
+    calc_total_sales = calc_velocity * total_stores
+    
+    item = dict(s)
+    item["calc_velocity"] = calc_velocity
+    item["calc_total_sales"] = calc_total_sales
+    item["reason_desc"] = "；".join(reasons) if reasons else "符合全美标准基准流速"
+    calculated_states.append(item)
+
+df_res = pd.DataFrame(calculated_states)
+df_res["rank"] = df_res["calc_velocity"].rank(ascending=False, method="min").astype(int)
+df_sorted = df_res.sort_values(by="rank", ascending=True).reset_index(drop=True)
+df_sorted["序号"] = df_sorted.index + 1
+
+# ==============================================================================
+# 5. 还原截图样式的大卡片 KPI 看板
+# ==============================================================================
+sum_velocity = int(df_sorted["calc_velocity"].sum())
+top_1_state = df_sorted.iloc[0]
+avg_vel = int(df_sorted["calc_velocity"].mean())
+
+kpi1, kpi2, kpi3, kpi4 = st.columns(4)
+
+with kpi1:
     st.markdown(f"""
-    <div class="season-box">
-        <h4 style="margin:0 0 6px 0; color:#92400E;">⏰ 当前补货时钟：{season_title}</h4>
-        <p style="margin:0 0 6px 0; color:#B45309; font-size:0.92rem;"><b>业务指引：</b>{season_desc}</p>
-        <p style="margin:0; color:#78350F; font-size:0.85rem;">🚢 <b>供应链时钟建议：</b>国内港口（宁波/盐田）海运直发至美中/美东枢纽仓平均需 <b>35～45 天</b>，清关提柜需 <b>5～7 天</b>。当前出运批次可精准接轨后续 2 个月的核心促销周期！</p>
+    <div class="kpi-card">
+        <div class="kpi-title">总铺店州数</div>
+        <div class="kpi-val">48</div>
     </div>
     """, unsafe_allow_html=True)
 
-# ==============================================================================
-# 4. 侧边栏：官方数据源配置与 Excel 导入
-# ==============================================================================
-with st.sidebar:
-    st.header("⚙️ 官方售卖点数据配置")
-    
-    st.markdown("### 📤 导入官方在售明细 (可选)")
-    uploaded_file = st.file_uploader(
-        "上传商超官方在售表 (.csv 或 .xlsx)",
-        type=["csv", "xlsx"],
-        help="支持上传 The Home Depot Supplier Hub 或 Lowe's 后台导出的门店在售清单。只要表格中包含一列州名或缩写（如 State、省份），系统将自动替换基准测算，精准统计每州真实在售店数！"
-    )
-    
-    uploaded_counts = {}
-    if uploaded_file is not None:
-        try:
-            if uploaded_file.name.endswith(".csv"):
-                up_df = pd.read_csv(uploaded_file)
-            else:
-                up_df = pd.read_excel(uploaded_file)
-                
-            state_col = None
-            for col in up_df.columns:
-                c_clean = str(col).strip().lower()
-                if c_clean in ["state", "st", "province", "州", "缩写", "state_code"]:
-                    state_col = col
-                    break
-            
-            if state_col:
-                val_counts = up_df[state_col].astype(str).str.strip().str.upper().value_counts()
-                uploaded_counts = val_counts.to_dict()
-                st.success(f"✅ 成功识别在售点数据！共解析到 {len(uploaded_counts)} 个州的实时在售记录。")
-            else:
-                st.warning("⚠️ 表格中未识别到明确的「State / 州」列，已沿用商超官方基准数据库。")
-        except Exception as e:
-            st.error(f"解析失败: {str(e)}")
-            
-    st.markdown("---")
-    calc_channel = st.selectbox(
-        "若无上传文件，采用官方基准网点：",
-        ["The Home Depot + Lowe's 官方总售卖点", "仅 The Home Depot 售卖点", "仅 Lowe's 售卖点"],
-        index=0
-    )
-    
-    coverage_rate = st.slider(
-        "当前产品预估在售覆盖率 (%)：",
-        min_value=10, max_value=100, value=85, step=5,
-        help="若未上传在售表，系统将按该比例计算实际铺货门店数"
-    )
-    
-    st.markdown("---")
-    st.caption("💡 计算公式：全州实时总销能 = 真实在售门店数 × 单店出货流速 (件/店)")
+with kpi2:
+    st.markdown(f"""
+    <div class="kpi-card">
+        <div class="kpi-title">当前组合·全美同期流速指数</div>
+        <div class="kpi-val">{sum_velocity:,}</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+with kpi3:
+    st.markdown(f"""
+    <div class="kpi-card">
+        <div class="kpi-title">最高动销榜首州</div>
+        <div class="kpi-val">{top_1_state['abbr']} ({top_1_state['calc_velocity']:,})</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+with kpi4:
+    st.markdown(f"""
+    <div class="kpi-card">
+        <div class="kpi-title">全美单店平均销能</div>
+        <div class="kpi-val">{avg_vel:,} 件/店</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+st.markdown("<br>", unsafe_allow_html=True)
 
 # ==============================================================================
-# 5. 动态计算全美销能与有效售卖点
+# 6. 数据结果展示：排行大表与单州详情
 # ==============================================================================
-states_list = []
-for s in STATES_DATA:
-    abbr = s["abbr"]
-    if "仅 The Home Depot" in calc_channel:
-        base_stores = s["thd_stores"]
-    elif "仅 Lowe's" in calc_channel:
-        base_stores = s["lowes_stores"]
-    else:
-        base_stores = s["thd_stores"] + s["lowes_stores"]
-        
-    if abbr in uploaded_counts:
-        active_stores = int(uploaded_counts[abbr])
-        source_tag = "官方上传在售表"
-    else:
-        active_stores = int(base_stores * (coverage_rate / 100.0))
-        source_tag = f"官方基准({coverage_rate}%覆盖)"
-        
-    total_sales_capacity = active_stores * s["velocity"]
-    
-    item = dict(s)
-    item["base_stores"] = base_stores
-    item["active_stores"] = active_stores
-    item["total_capacity"] = total_sales_capacity
-    item["source_tag"] = source_tag
-    states_list.append(item)
+col_table, col_detail = st.columns(2)
 
-df = pd.DataFrame(states_list)
-df["capacity_rank"] = df["total_capacity"].rank(ascending=False, method="min").astype(int)
+with col_table:
+    st.markdown("#### 📋 全美各州【同期销量/铺店数】排行状况")
+    st.caption("与商超后台报表完全一致的排名表：实时随上方【位置/材质/颜色/尺寸】动态重排")
+    
+    view_table = df_sorted[["序号", "abbr", "cn", "calc_velocity", "thd_stores", "lowes_stores", "climate"]]
+    view_table.columns = ["序号", "州简称", "中文全名", "同期销量/铺店数", "THD门店", "Lowe's门店", "气候带"]
+    st.dataframe(view_table, height=520, use_container_width=True)
+
+with col_detail:
+    st.markdown("#### 🔍 选中州在当前属性组合下的深度研判")
+    inspect_abbr = st.selectbox("选择要深入透视的州：", df_sorted["abbr"].tolist(), index=0)
+    cur = df_sorted[df_sorted["abbr"] == inspect_abbr].iloc[0]
+    
+    st.markdown(f"### 📌 {cur['cn']} (`{cur['abbr']}`)")
+    st.metric("该属性组合下预估单店销能", f"{cur['calc_velocity']:,} 件/店", f"全美排名: 第 {cur['序号']} 名")
+    
+    st.info(f"**💡 算法归因分析**：\n{cur['reason_desc']}")
+    st.write(f"**🏠 房屋构造**：{cur['foundation']}")
+    st.write(f"**🌡️ 当地气候**：{cur['climate']}")
+    st.write(f"**🪵 地面材质偏好**：{cur['flooring_preference']}")
+    st.success(f"**✅ 当地常规主推**：{cur['best']}")
+    st.warning(f"**⚠️ 当地规避品类**：{cur['avoid']}")
+    st.markdown(f"**🛒 零售商超渠道建议**：{cur['channel_advice']}")
 
 # ==============================================================================
-# 6. 核心功能标签页导航
+# 7. 一键下载
 # ==============================================================================
-tab_search, tab_specs, tab_table = st.tabs([
-    "🔍 单州售卖点与气候详情下钻",
-    "📐 规格尺寸与地材匹配指南",
-    "📊 全美 48 州售卖点实时大屏"
-])
-
-# ---------------- Tab 1: 单州详情 ----------------
-with tab_search:
-    st.subheader("🔍 单州详情与全景分析卡片")
-    options = [f"{s['abbr']} - {s['cn']} ({s['en']})" for s in states_list]
-    
-    col_sel, col_rank = st.columns(2)
-    with col_sel:
-        selected_option = st.selectbox("请选择要查询的州（支持输入州名或缩写）：", options, index=0)
-        sel_abbr = selected_option.split(" - ")[0]
-        cur = next(s for s in states_list if s["abbr"] == sel_abbr)
-        cur_rank = int(df[df["abbr"] == sel_abbr]["capacity_rank"].values[0])
-    with col_rank:
-        st.markdown("<br>", unsafe_allow_html=True)
-        st.caption(f"当前数据源：`{cur['source_tag']}`")
-
-    k1, k2, k3, k4 = st.columns(4)
-    k1.metric("该州官方有效在售点", f"{cur['active_stores']} 家", f"商超总网点: {cur['base_stores']} 家")
-    k2.metric("单店出货流速 (件/店)", f"{cur['velocity']:,} 件")
-    k3.metric("全州实时总动销能级", f"{cur['total_capacity']:,} 件")
-    k4.metric("全美实时动销总排名", f"第 {cur_rank} 名 / 48")
-
-    st.markdown("---")
-    
-    c_left, c_right = st.columns(2)
-    with c_left:
-        st.markdown("### 🌡️ 气候与住宅地基结构")
-        st.write(f"**气候分类与表现**：{cur['climate']}")
-        st.write(f"**地基与管网形式**：{cur['foundation']}")
-        st.info(f"**🪵 地面材质偏好**：{cur['flooring_preference']}")
-        
-    with c_right:
-        st.markdown("### 🎯 选品与货架策略")
-        st.success(f"**✅ 适销主推产品**：{cur['best']}")
-        st.warning(f"**⚠️ 避坑/受限产品**：{cur['avoid']}")
-        st.markdown("### 📐 推荐主打规格分布")
-        st.write(f"{cur['size_breakdown']}")
-
-    st.markdown("### 🛒 零售商超渠道策略")
-    st.info(f"**实战建议**：{cur['channel_advice']}")
-
-# ---------------- Tab 2: 规格与地材矩阵 ----------------
-with tab_specs:
-    st.subheader("📐 北美出风口核心开孔规格与地材适配指南")
-    st.markdown("""
-    在北美大零售渠道，选品尺寸不精准是导致商超退货与积压的核心原因之一。各大区域因住宅建造年份不同，尺寸偏好差异显著：
-    """)
-    
-    s1, s2, s3 = st.columns(3)
-    with s1:
-        st.markdown("#### 🌟 4x10 英寸（全美大通货）")
-        st.write("- **全美占比**：约 65% - 70%")
-        st.write("- **适用区域**：全美所有具备地面风管的独立住宅")
-        st.write("- **备货建议**：任何首批进店必铺的核心规格，必须占单店 SKU 货架面积的一半以上。")
-    with s2:
-        st.markdown("#### 🏛️ 4x12 与 2x12 英寸（老宅与特殊区）")
-        st.write("- **全美占比**：约 15% - 25%")
-        st.write("- **适用区域**：中东部与东北部老州（PA、OH、NY、MA、IL）")
-        st.write("- **结构特点**：4x12 适用于大挑高空间；2x12 多用于厨房橱柜底踢脚线（Toe-kick）或卫生间。")
-    with s3:
-        st.markdown("#### 🌀 6x6～12x12 顶装散流器（南方特供）")
-        st.write("- **全美占比**：南方阳光带占 80%+")
-        st.write("- **适用区域**：佛罗里达 (FL)、德州 (TX)、加州 (CA)、亚利桑那 (AZ)")
-        st.write("- **结构特点**：天花板出风要求重量轻（ABS树脂/薄铝合金）、可调扩散叶片。")
-
-    st.markdown("---")
-    st.markdown("#### 🪵 地面材料配合与承重注意要点：")
-    st.markdown("""
-    1. **实木地板 (Hardwood) 与 LVP 锁扣地板**：在中东部（NC、TN、KY、IN）占 80% 以上。外框边缘法兰盘厚度严禁过厚（建议不超过 2.5mm），避免绊脚；
-    2. **防卡鞋跟 (Heel-proof < 9.5mm)**：中高端社区（如 VA、MD、NJ）买家非常在意细高跟鞋被卡入格栅，缝隙必须经过防卡设计；
-    3. **瓷砖地面 (Tile) 与高盐雾**：东南沿海浴室与厨房铺设较多，金属件需经受住盐雾测试，建议主推耐腐蚀 ABS 树脂或阳极氧化铝。
-    """)
-
-# ---------------- Tab 3: 全美大屏 ----------------
-with tab_table:
-    st.subheader("📊 全美 48 州售卖点与销能实时数据表")
-    
-    total_stores_sum = df["active_stores"].sum()
-    total_cap_sum = df["total_capacity"].sum()
-    
-    m_a, m_b, m_c = st.columns(3)
-    m_a.metric("全美有效在售门店总数", f"{total_stores_sum:,} 家")
-    m_b.metric("全美实时预估总动销能级", f"{total_cap_sum:,} 件")
-    m_c.metric("综合排名第一", f"{df.sort_values(by='total_capacity', ascending=False).iloc[0]['cn']}")
-    
-    st.markdown("---")
-    
-    show_df = df[["capacity_rank", "abbr", "cn", "en", "base_stores", "active_stores", "velocity", "total_capacity", "climate", "foundation", "best", "avoid", "size_breakdown"]]
-    show_df.columns = ["实时总排名", "缩写", "中文州名", "英文州名", "商超基准店数", "有效在售店数", "单店流速(件/店)", "全州实时总动销(件)", "气候带", "房屋地基", "适销主推", "避坑品类", "开孔尺寸建议"]
-    
-    st.dataframe(show_df.sort_values(by="实时总排名"), use_container_width=True, height=550)
-    
-    csv_bytes = show_df.to_csv(index=False).encode('utf-8-sig')
-    st.download_button(
-        label="📥 一键下载全美实时售卖点统计分析表 (.csv)",
-        data=csv_bytes,
-        file_name="US_RealTime_Store_Sales_Analysis_Pro.csv",
-        mime="text/csv"
-    )
+st.markdown("---")
+csv_out = df_sorted[["序号", "abbr", "cn", "en", "calc_velocity", "calc_total_sales", "climate", "foundation", "reason_desc"]].to_csv(index=False).encode('utf-8-sig')
+st.download_button(
+    label="📥 一键导出当前属性筛选下的全美销售数据表 (.csv)",
+    data=csv_out,
+    file_name=f"US_Sales_Matrix_{sel_pos}_{sel_mat}_{sel_fin}_{sel_size}.csv",
+    mime="text/csv"
+)
