@@ -265,4 +265,280 @@ for s in STATES_DATA:
                 weight *= 0.12
                 reasons.append("水泥实心大平板，地面无开槽管道，严禁推地板款")
         elif sel_pos == "Ceiling":
-            if abbr in ["FL",
+            if abbr in ["FL", "TX", "AZ", "NV", "CA", "GA", "HI"]:
+                weight *= 2.8
+                reasons.append("长夏极热阳光带，天花板下吹冷气普及率全美第一")
+            elif abbr in ["MI", "ND", "MN", "WI", "AK"]:
+                weight *= 0.45
+                reasons.append("北方以地板向上供暖为主，天花风口占比低")
+        elif sel_pos == "Baseboard":
+            if abbr in ["PA", "NY", "MA", "CT", "OH", "NJ", "RI"]:
+                weight *= 1.9
+                reasons.append("美东老房水暖踢脚线与小缝隙出风改造极为密集")
+
+    elif cur_cat_conf["tag"] == "PLUMBING":
+        if sel_pos in ["Linear", "Floor"]:
+            if abbr in ["FL", "CA", "TX", "NC", "SC", "GA", "AZ"]:
+                weight *= 2.1
+                reasons.append("南部与西海岸现代无门槛大板淋浴房(Curbless Shower)翻新热潮")
+        elif sel_pos == "Frost-Proof":
+            if abbr in ["MN", "WI", "MI", "ND", "SD", "IL", "OH", "AK"]:
+                weight *= 3.0
+                reasons.append("深冬深度冻土，室外防冻阀是建筑规范硬性防爆管要求")
+            elif abbr in ["FL", "TX", "AZ", "HI"]:
+                weight *= 0.05
+                reasons.append("常年无霜冻冰封，防冻水龙头几乎零需求")
+
+    elif cur_cat_conf["tag"] == "FLOORING":
+        if "Tile" in sel_pos:
+            if abbr in ["FL", "TX", "AZ", "CA", "NV", "HI"]:
+                weight *= 2.6
+                reasons.append("通铺瓷砖大板为主流，金属防撞收口条极高频走货")
+        elif "T-Molding" in sel_pos or "Reducer" in sel_pos:
+            if abbr in ["NC", "TN", "KY", "OH", "IN", "PA", "MI", "VA"]:
+                weight *= 1.8
+                reasons.append("全美实木地板与LVP木纹板最大存量区，房间交界处标配")
+
+    elif cur_cat_conf["tag"] == "DOORS":
+        if "Sweep" in sel_pos or "Weatherstripping" in sel_pos:
+            if abbr in ["KS", "NE", "ND", "SD", "MN", "IL", "OH", "MI", "NY", "AK"]:
+                weight *= 2.4
+                reasons.append("北方寒冬穿堂风剧烈，门底封堵是降低高昂采暖电费的第一步")
+        elif "Hurricane" in sel_pos:
+            if abbr in ["FL", "NC", "SC", "TX", "LA", "AL", "HI"]:
+                weight *= 3.5
+                reasons.append("大西洋飓风带(HVHZ法典)强制要求高强度防风抗拉拔构件")
+
+    elif cur_cat_conf["tag"] == "OUTDOOR":
+        if "Trench" in sel_pos:
+            if abbr in ["FL", "LA", "TX", "WA", "OR", "GA", "NC", "SC", "HI"]:
+                weight *= 2.5
+                reasons.append("强降雨量、多泳池及雨林环境，车道防内涝倒灌依赖深沟")
+        elif "Gutter" in sel_pos:
+            if abbr in ["NC", "GA", "TN", "VA", "PA", "OH", "MI", "OR", "WA"]:
+                weight *= 2.2
+                reasons.append("森林覆盖率极高，秋季防止枯叶塞死屋檐水管刚需")
+
+    # -------- 2. 季节性脉冲加权 (Seasonality Impact) --------
+    if "Q3 秋季" in season_choice:
+        if cur_cat_conf["tag"] == "DOORS" and ("Sweep" in sel_pos or "Weatherstripping" in sel_pos):
+            weight *= 1.6
+            reasons.append("🍂 处于入冬防寒整备季（Fall Weatherization），销量脉冲式激增")
+        elif cur_cat_conf["tag"] == "OUTDOOR" and "Gutter" in sel_pos:
+            weight *= 1.8
+            reasons.append("🍂 处于秋季落叶高峰期，天沟滤网迎来全美年度最高峰出货")
+        elif cur_cat_conf["tag"] == "HVAC" and sel_pos == "Floor":
+            weight *= 1.3
+            reasons.append("🍂 入冬供暖系统检修换新，老旧风口成套更新")
+
+    elif "Q2 夏季" in season_choice:
+        if cur_cat_conf["tag"] == "HVAC" and sel_pos == "Ceiling":
+            weight *= 1.7
+            reasons.append("☀️ 处于全美酷暑制冷峰值，天花板散流器换新需求旺盛")
+        elif cur_cat_conf["tag"] == "OUTDOOR" and "Trench" in sel_pos:
+            weight *= 1.4
+            reasons.append("☀️ 泳池建设与户外烧烤露台施工旺季")
+
+    elif "Q4 深冬" in season_choice:
+        if cur_cat_conf["tag"] == "PLUMBING" and sel_pos == "Frost-Proof":
+            weight *= 2.0
+            reasons.append("❄️ 极寒深度冰封，水管冻裂紧急抢修更换")
+        elif cur_cat_conf["tag"] == "OUTDOOR":
+            weight *= 0.4
+            reasons.append("❄️ 户外冻土积雪，土建与庭院施工大面积停工")
+
+    elif "Q1 春季" in season_choice:
+        if cur_cat_conf["tag"] in ["FLOORING", "PLUMBING"]:
+            weight *= 1.3
+            reasons.append("🌱 美国春季退税到账（Tax Refund），室内卫浴与地板二次翻修热潮")
+
+    # -------- 3. 材质、尺寸与颜色微调 --------
+    if sel_mat in ["Stainless", "Aluminum", "Plastic"] and abbr in ["FL", "HI", "SC", "NC", "LA"]:
+        weight *= 1.2
+    if sel_fin in ["BL", "Titanium"] and abbr in ["WA", "OR", "CA", "CO", "UT"]:
+        weight *= 1.2
+    if sel_size in ["04X10", "36", "4x4", "39"]:
+        weight *= 1.15
+
+    calc_vel = max(int(base_velocity * weight), 30)
+    calc_total = calc_vel * active_stores
+    
+    item = dict(s)
+    item["calc_vel"] = calc_vel
+    item["calc_total"] = calc_total
+    item["active_stores"] = active_stores
+    item["reason_desc"] = "；".join(reasons) if reasons else f"符合【{cur_cat_conf['short_name']}】常态流速基线"
+    calculated_states.append(item)
+
+df_res = pd.DataFrame(calculated_states)
+df_res["rank_vel"] = df_res["calc_vel"].rank(ascending=False, method="min").astype(int)
+df_res["rank_total"] = df_res["calc_total"].rank(ascending=False, method="min").astype(int)
+
+# ==============================================================================
+# 6. 大卡片 KPI 看板
+# ==============================================================================
+sum_stores = int(df_res["active_stores"].sum())
+sum_units = int(df_res["calc_total"].sum())
+top_vel = df_res.sort_values(by="calc_vel", ascending=False).iloc[0]
+top_total = df_res.sort_values(by="calc_total", ascending=False).iloc[0]
+
+c_k1, c_k2, c_k3, c_k4 = st.columns(4)
+with c_k1:
+    st.markdown(f"""
+    <div class="kpi-card">
+        <div class="kpi-title">分析渠道有效总门店</div>
+        <div class="kpi-val">{sum_stores:,} 家</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+with c_k2:
+    st.markdown(f"""
+    <div class="kpi-card">
+        <div class="kpi-title">该节令·全美总采购吞吐预估</div>
+        <div class="kpi-val">{sum_units:,} 件</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+with c_k3:
+    st.markdown(f"""
+    <div class="kpi-card">
+        <div class="kpi-title">单店动销第一强州 (平效冠军)</div>
+        <div class="kpi-val">{top_vel['cn']} ({top_vel['calc_vel']:,} 件/店)</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+with c_k4:
+    st.markdown(f"""
+    <div class="kpi-card">
+        <div class="kpi-title">出货绝对总量霸主 (排产核心)</div>
+        <div class="kpi-val">{top_total['cn']} ({top_total['calc_total']:,} 件)</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+st.markdown("<br>", unsafe_allow_html=True)
+
+# ==============================================================================
+# 7. 排行状况与深度归因（双重视角）
+# ==============================================================================
+col_main_table, col_deep_inspect = st.columns([1.15, 0.85])
+
+with col_main_table:
+    view_mode = st.radio("切换主视角：", ["单店平均流速视角 (件/店)", "全州渠道总吞吐量视角 (件)"], horizontal=True)
+    sort_key = "rank_vel" if "单店" in view_mode else "rank_total"
+    
+    df_sorted = df_res.sort_values(by=sort_key, ascending=True).reset_index(drop=True)
+    df_sorted["序号"] = df_sorted.index + 1
+
+    st.dataframe(
+        df_sorted[["序号", "abbr", "cn", "calc_vel", "calc_total", "active_stores", "climate", "region"]],
+        height=540,
+        use_container_width=True,
+        column_config={
+            "序号": st.column_config.NumberColumn(width=50),
+            "abbr": st.column_config.TextColumn("州简称", width=65),
+            "cn": st.column_config.TextColumn("州中文全称", width=95),
+            "calc_vel": st.column_config.ProgressColumn(
+                "单店流速 (件/店)",
+                min_value=0,
+                max_value=int(df_res["calc_vel"].max()),
+                format="%d"
+            ),
+            "calc_total": st.column_config.NumberColumn("渠道总销量 (件)", format="%d"),
+            "active_stores": st.column_config.NumberColumn("覆盖门店", width=70),
+            "climate": st.column_config.TextColumn("气候带", width=110),
+            "region": st.column_config.TextColumn("地理分区", width=85)
+        },
+        hide_index=True
+    )
+
+with col_deep_inspect:
+    st.markdown("#### 🔍 州级商业归因与法务避坑雷达")
+    target_abbr = st.selectbox("选择要透视的州：", df_sorted["abbr"].tolist(), index=0)
+    st_info = df_sorted[df_sorted["abbr"] == target_abbr].iloc[0]
+
+    st.markdown(f"### 📍 {st_info['cn']} ({st_info['abbr']}) · {st_info['region']}")
+    
+    sc1, sc2 = st.columns(2)
+    with sc1:
+        st.metric("预估单店出货能力", f"{st_info['calc_vel']:,} 件/店", f"全美排名: #{st_info['rank_vel']}")
+    with sc2:
+        st.metric("全渠道总采购需求", f"{st_info['calc_total']:,} 件", f"全美排名: #{st_info['rank_total']}")
+
+    st.info(f"**💡 驱动归因与节令反馈**：\n{st_info['reason_desc']}")
+    st.write(f"**🏠 房屋基底结构**：{st_info['foundation']}")
+    st.write(f"**🌡️ 当地气象气候**：{st_info['climate']}")
+    st.write(f"**🏬 区域门店网络**：THD: **{st_info['thd']}** 家 | Lowe's: **{st_info['lowes']}** 家 | Menards: **{st_info['menards']}** 家")
+    st.success(f"**✅ 当地常规主推品**：{st_info['best']}")
+    st.warning(f"**⚠️ 当地谨慎进入品**：{st_info['avoid']}")
+
+    # 扩充：美国严苛的法务合规雷达（避免中国供应商遭遇巨额罚单）
+    radar_alerts = []
+    if target_abbr == "CA":
+        radar_alerts.append("⚠️ **加州 Prop 65（65号提案）**：含铅量超标极易遭遇职业赏金律师提告，包装必须印制清晰致癌警告贴标；且需满足 **Title 24** 气密性能源审计标准。")
+    if target_abbr in ["FL", "NC", "SC", "LA", "TX"] and cur_cat_conf["tag"] in ["DOORS", "OUTDOOR"]:
+        radar_alerts.append("⚠️ **飓风高风压法典 (HVHZ / Miami-Dade NOA)**：门窗构件与户外结构件必须通过当地大风压抗飞弹撞击测试认证，否则房屋无法通过竣工验收或拒保。")
+    if cur_cat_conf["tag"] == "FLOORING":
+        radar_alerts.append("ℹ️ **联邦 ADA 残疾人无障碍法案**：压条地贴高低落差若超过 1/4 英寸（6.4mm），必须配备缓坡倒角（Beveled Edge），否则出租房有被房客起诉风险。")
+    if cur_cat_conf["tag"] == "PLUMBING" and "Brass" in sel_mat:
+        radar_alerts.append("⚠️ **无铅法案 (Safe Drinking Water Act / NSF 61)**：凡涉及供水水暖构件，接水五金过水面含铅量必须严格加权低于 0.25%，须取得 NSF/IAPMO 认证。")
+
+    if radar_alerts:
+        st.markdown('<div class="radar-box">', unsafe_allow_html=True)
+        st.markdown("**🛡️ 美国法务与零售准入合规警示 (Legal Radar)：**")
+        for alert in radar_alerts:
+            st.markdown(alert)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+# ==============================================================================
+# 8. 扩充专栏：客户画像 (DIY vs Pro) 与退货率控制策略
+# ==============================================================================
+st.markdown("---")
+st.markdown("### 📦 采购客群画像 (DIY vs Pro) 与退货率控制建议")
+
+pro_col1, pro_col2, pro_col3 = st.columns(3)
+
+# 动态判断客群属性
+if sel_size in ["04X10", "36"] and sel_fin in ["WH", "BL"]:
+    diy_pct, pro_pct = 70, 30
+    ret_rate = "3% ~ 5% (常规低风险)"
+    pkg_type = "标准彩色吊卡 / 气泡热缩膜 (配螺丝)"
+    advice = "大众标准化尺寸，普通家庭屋主一把十字螺丝刀即可更换，注重吊卡陈列的美观性。"
+elif sel_size in ["02X12", "12X12", "72"] or "Hurricane" in sel_pos:
+    diy_pct, pro_pct = 20, 80
+    ret_rate = "1.5% (极低退货率)"
+    pkg_type = "Contractor Pack (10-20件整箱牛皮纸工程包装)"
+    advice = "多属于专业木工或安装承包商采购。Pro客户只在乎产品结实、尺寸精密与单价实惠，尽量做多件装降成本。"
+else:
+    diy_pct, pro_pct = 50, 50
+    ret_rate = "7% ~ 10% (高退货高风险!)"
+    pkg_type = "带 1:1 测量卡尺的防错彩盒包装"
+    advice = "属于细分或多规格产品，老美屋主经常量错尺寸（如风管内径 vs 外沿）。包装必须醒目印上测量图，否则退货成本将吃光利润！"
+
+with pro_col1:
+    st.metric("预估 DIY 个人散客占比", f"{diy_pct}%")
+    st.caption("客群特征：重视颜值陈列、需要附带详细傻瓜式安装说明书与配件。")
+
+with pro_col2:
+    st.metric("预估 Pro 专业承包商占比", f"{pro_pct}%")
+    st.caption("客群特征：推平板车整箱拉走、对品牌公差极其挑剔、看重工程装单价。")
+
+with pro_col3:
+    st.metric("全美预估退货率 (Return Rate)", ret_rate)
+    st.markdown(f"**建议包装规格**：`{pkg_type}`")
+    st.caption(f"**运营注意**：{advice}")
+
+# ==============================================================================
+# 9. 数据导出
+# ==============================================================================
+st.markdown("---")
+csv_out = df_sorted[[
+    "序号", "abbr", "cn", "en", "region", "calc_vel", "calc_total",
+    "active_stores", "climate", "foundation", "dc", "reason_desc"
+]].to_csv(index=False).encode('utf-8-sig')
+
+st.download_button(
+    label=f"📥 导出【{cur_cat_conf['short_name']}】全美 50 州零售决策模型报表 (.csv)",
+    data=csv_out,
+    file_name=f"US_Retail_Intelligence_{cur_cat_conf['tag']}_{target_channel[:3]}.csv",
+    mime="text/csv"
+)
