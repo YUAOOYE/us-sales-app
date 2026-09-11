@@ -5,7 +5,7 @@ import altair as alt
 from datetime import datetime
 
 # ==============================================================================
-# 1. 页面配置与企业级高级 BI 科技蓝 CSS
+# 1. 页面配置与企业级高级 BI 科技蓝 CSS 注入
 # ==============================================================================
 st.set_page_config(
     page_title="宁波威霖住宅设施 · 北美大零售商业与工程决策系统",
@@ -73,13 +73,12 @@ curr_month = current_dt.month
 curr_week = current_dt.isocalendar()[1]
 
 # ==============================================================================
-# 2. 侧边栏：威霖外贸买手财务核算器
+# 2. 侧边栏：完整找回并扩充【北美外贸与工程实战全景知识库】+ 财务核算
 # ==============================================================================
 with st.sidebar:
     st.image("https://img.icons8.com/fluency/96/factory.png", width=46)
     st.markdown("### 💰 威霖到岸财务与毛利试算")
     st.caption(f"宁波威霖住宅设施有限公司 · {curr_year} 动态核价")
-    st.markdown("---")
     
     fob_cost = st.number_input("1. 威霖出厂供货价 FOB ($/件)：", min_value=0.5, max_value=200.0, value=3.80, step=0.2)
     ocean_freight = st.number_input("2. 单件美线分摊海运费 ($/件)：", min_value=0.0, max_value=50.0, value=0.65, step=0.05)
@@ -92,24 +91,69 @@ with st.sidebar:
     gross_profit_unit = retail_msrp - landed_cost
     
     st.markdown(f"""
-    <div style='background:white;padding:12px 14px;border-radius:6px;border:1px solid #E2E8F0;'>
-        <span style='font-size:0.82rem;color:#64748B;'>到岸完税成本 (Landed DDP)</span><br>
-        <b style='font-size:1.25rem;color:#0F172A;'>${landed_cost:.2f}</b><br><br>
-        <span style='font-size:0.82rem;color:#64748B;'>商超零售净毛利率 (Buyer Margin)</span><br>
-        <b style='font-size:1.25rem;color:{'#166534' if buyer_margin>=42 else '#991B1B'};'>{buyer_margin:.1f}%</b>
+    <div style='background:white;padding:10px 12px;border-radius:6px;border:1px solid #CBD5E1;margin-bottom:12px;'>
+        <span style='font-size:0.8rem;color:#64748B;'>到岸完税成本 (Landed DDP)</span>: <b style='color:#0F172A;'>${landed_cost:.2f}</b><br>
+        <span style='font-size:0.8rem;color:#64748B;'>商超单件毛利额</span>: <b style='color:#0F172A;'>${gross_profit_unit:.2f}</b><br>
+        <span style='font-size:0.8rem;color:#64748B;'>零售净毛利率 (Buyer Margin)</span>: <b style='color:{'#166534' if buyer_margin>=42 else '#991B1B'};'>{buyer_margin:.1f}%</b>
     </div>
     """, unsafe_allow_html=True)
     
     st.markdown("---")
-    st.caption("🏭 **威霖象山工业园制造能力背书**：\n• 14 万平米智能制造基地\n• 绿色环保PVD镀膜中心\n• 自动化连续冲压/精密注塑\n• cUPC / UL 认证目击实验室")
+    st.markdown("### 📚 北美商超与工程实战全景词典")
+    
+    with st.expander("1. 房屋地基与对流原理 (Foundation)", expanded=False):
+        st.write("""
+        * **北方/中西部（全地下室 Basement）**：冻土线深，强制深挖地下室。暖气炉在地下，**热空气自然向上升**，地面出风口（Floor Register）是全屋标配。
+        * **南方阳光带（水泥实心大平板 Slab）**：地下水高或地表膨胀土，直接浇筑实心水泥地，**地面绝对无管道**！冷气由阁楼向下吹，出风口 100% 在天花板。
+        """)
+        
+    with st.expander("2. ASHRAE 暖通与 HDD/CDD 能耗度日", expanded=False):
+        st.write("""
+        * **HDD (采暖度日)**：基准 65°F。HDD > 5000 区域长年开暖气，出风口长年承受 55℃~65℃ 干燥热风烘烤，防热变形是硬指标。
+        * **CDD (制冷度日)**：基准 65°F。CDD > 2000 区域长夏高湿开冷气，天花散流器防结露冷凝滴水是第一大客诉源。
+        """)
+
+    with st.expander("3. 冻土深度与融雪盐防腐红线", expanded=False):
+        st.write("""
+        * **冻土线 (Frost Depth)**：北方深达 36~60 英寸，室外防冻龙头必须选 **8~12 英寸超长杆**；南方 4 英寸短杆即可。
+        * **融雪盐 (De-icing Salt)**：雪带冬季大量撒盐。鞋底盐水带入玄关，冷轧钢风口和压条 2 年即生锈烂穿，当地必须推**阳极氧化铝（6063）**或不锈钢。
+        """)
+
+    with st.expander("4. 北美三大零售商 (Big 3) 基因差异", expanded=False):
+        st.write("""
+        * **The Home Depot**：偏向 Pro 专业工匠承包商，客单大，看重工程大包装（Contractor Pack）与极限承重。
+        * **Lowe's**：偏向家庭 DIY 散客与女性屋主，店面更明亮，注重彩色吊卡视觉颜值与软装搭配。
+        * **Menards**：中西部农业大湖区地头蛇（330+大店），主打“全场 11% Rebate 返现”，工薪农场主死忠渠道。
+        """)
+
+    with st.expander("5. 商超买手合同潜规则 (Allowances)", expanded=False):
+        st.write("""
+        * **Defective Allowance (残损补贴)**：商超合同常规定期在发票中扣除 **2% ~ 4%** 作为无理由退货与破损补贴，报价 FOB 时必须计入成本。
+        * **Buyback (库存回购)**：滞销清仓时零售商会强制要求供应商降价或买回滞销库存。
+        * **Chargeback (物流罚款)**：外箱条码扫描率低于 99.5% 或送货迟到会面临单笔 $250~$500 罚款。
+        """)
+
+    with st.expander("6. GMA 托盘标准与 EDI 数据对接", expanded=False):
+        st.write("""
+        * **GMA 木托盘**：48 × 40 英寸，四向进叉，含托总高度 ≤ 52 英寸，总重 ≤ 2000 磅。
+        * **EDI 电子数据交换**：入驻商超必须支持 ANSI X12 格式（EDI 850 采购订单、EDI 856 发货通知 ASN、EDI 810 发票）。
+        """)
+
+    with st.expander("7. 全美出口合规与环保红线清单", expanded=False):
+        st.write("""
+        * **加州 Prop 65**：无铅与塑化剂报告必须齐全，否则必须贴致癌黄标，防范赏金律师起诉。
+        * **加州 Title 24 & WUI**：出风口低漏风率气密性测试与外墙 1/8 英寸防火防飞烬金属网。
+        * **佛州 HVHZ**：迈阿密-戴德县 NOA 强飓风抗飞弹冲击测试。
+        * **联邦 ADA**：地面高低差 ≤ 1/4 英寸并配缓坡，防范租客滑倒起诉。
+        """)
 
 # ==============================================================================
-# 3. 产线对标与北美主要竞品对家全景数据库（包含材质厚度与盐雾测试指标）
+# 3. 核心品类与对家竞品版图（威霖五大产线对齐）
 # ==============================================================================
 CATEGORY_CONFIG = {
     "HVAC": {
         "name": "暖通风口与空气分配系统 (Registers & Grilles)",
-        "willi_fit": "威霖主力产品线：冲压钢、阳极氧化铝、压铸锌合金复古雕花、工程阻燃ABS出风口全系列。",
+        "willi_fit": "威霖主力核心板块：冲压冷轧钢、阳极氧化铝、压铸锌合金复古雕花、工程阻燃ABS出风口全系列。",
         "competitors": {
             "rival_name": "Accord Ventilation (全美第一巨头) / Deflecto",
             "shelf_share": "约 60% 黄金排面垄断",
@@ -134,7 +178,7 @@ CATEGORY_CONFIG = {
     },
     "PLUMBING": {
         "name": "卫浴排水与长条隐形地漏 (Drains & Plumbing)",
-        "willi_fit": "威霖主力产品线：不锈钢冲压拉伸、长条隐形线性地漏、防臭下水器、防冻长水阀全系列。",
+        "willi_fit": "威霖主力核心板块：不锈钢冲压拉伸、长条隐形线性地漏、防臭下水器、防冻长水阀全系列。",
         "competitors": {
             "rival_name": "Oatey (全美水暖耗材霸主) / Sioux Chief",
             "shelf_share": "约 65% 水暖通道排面垄断",
@@ -339,7 +383,7 @@ STATES_DATA = {
     }
 }
 
-# 补齐其余 39 州
+# 补全其余 39 州
 EXTRA_STATES = {
     "PA": ("宾夕法尼亚州", "Pennsylvania", "美东", 73, 83, 0, "老房全地下室比例高", 5400, 900, 38, 8.5, "极高", "老房融雪盐", 58, 28.5, ["ASTM B117 盐雾 480h", "cUPC 地漏"]),
     "NY": ("纽约州", "New York", "美东北", 100, 68, 0, "市区公寓无风管/独栋地下室", 5900, 800, 48, 5.5, "极高", "湖效应暴雪", 62, 26.0, ["NYSERDA 能源认证", "UL 94 阻燃"]),
@@ -396,7 +440,7 @@ df_states_raw["total_stores"] = df_states_raw["thd"] + df_states_raw["lowes"] + 
 ALL_REGIONS = ["全部大区 (All Regions)"] + sorted(list(set(df_states_raw["region"].tolist())))
 
 # ==============================================================================
-# 5. 顶层精致控制面板
+# 5. 顶层控制器面板
 # ==============================================================================
 st.markdown(f"""
 <div class="bi-header">
@@ -429,7 +473,7 @@ with c4:
         "Menards (中西部大区独立专营)"
     ], index=0)
 
-# 工法与客群控制排
+# 属性控制排
 st.markdown("#### 🎯 威霖制造工法与目标客群属性联动")
 f1, f2, f3, f4, f5 = st.columns(5)
 with f1:
@@ -661,25 +705,24 @@ st.markdown("<br>", unsafe_allow_html=True)
 # ==============================================================================
 # 8. 五大结构化职能选项卡（Tabs）
 # ==============================================================================
-tab_rank, tab_deepdive, tab_persona, tab_channel, tab_cert = st.tabs([
-    "📋 全美零售排行大盘",
-    "🎯 威霖单州深度调研与竞品对标",
-    "👥 客户人居习性与买家画像透视",
-    "📊 Big 3 零售格局与海运分仓",
-    "📜 威霖出海认证与法规红线雷达"
+tab_rank, tab_deepdive, tab_channel_pog, tab_persona, tab_supply_cert = st.tabs([
+    "📋 全美宏观与工程物理大盘",
+    "🎯 威霖单州深度调研与对家横向对标",
+    "🏬 渠道网络渗透与货架策略大盘",
+    "👥 客户人居画像与防退包装透视",
+    "🚢 供应链海运、打托与出口合规"
 ])
 
-# ----------------- TAB 1: 全美排行榜 -----------------
+# ----------------- TAB 1: 全美宏观大盘 -----------------
 with tab_rank:
     v_col1, v_col2 = st.columns([1.2, 1])
     with v_col1:
         view_mode = st.radio(
-            "选择排行榜主排序维度：",
+            "选择全美排行榜主排序维度：",
             ["全州渠道月总吞吐量 (件/月) - 适于工厂排产总盘计划", "单店平均月销售流速 (件/店/月) - 适于商超平效谈判与货架位申请"],
             horizontal=True
         )
     
-    # 滑动条筛选控件
     st.markdown("##### 🎚️ 互动数据过滤滑块 (Sliders)")
     slide_c1, slide_c2 = st.columns(2)
     with slide_c1:
@@ -697,10 +740,13 @@ with tab_rank:
     
     max_vel_val = max(int(df_all["calc_vel"].max()), 1)
     
+    # 增加基准线相对比例列
+    df_display["大盘相对指数"] = df_display["calc_vel"].apply(lambda x: f"{round(((x - national_avg_vel) / national_avg_vel)*100, 1):+0.1f}%")
+    
     st.dataframe(
         df_display[[
-            "序号", "abbr", "cn", "region", "tier", "calc_vel", "upsw", "calc_tot", "calc_rev_msrp",
-            "active_stores", "house_age", "pog", "foundation"
+            "序号", "abbr", "cn", "region", "tier", "calc_vel", "upsw", "大盘相对指数", "calc_tot", "calc_rev_msrp",
+            "active_stores", "house_age", "pog", "foundation", "climate", "frost_depth", "salt_risk"
         ]],
         use_container_width=True,
         column_config={
@@ -711,12 +757,16 @@ with tab_rank:
             "tier": st.column_config.TextColumn("战略梯队", width=110),
             "calc_vel": st.column_config.ProgressColumn("单店月流速", min_value=0, max_value=max_vel_val, format="%.1f 件"),
             "upsw": st.column_config.NumberColumn("单店周流速(UPSW)", format="%.1f 件/周"),
+            "大盘相对指数": st.column_config.TextColumn("大盘基准比", width=90),
             "calc_tot": st.column_config.NumberColumn("月总盘(件)", format="%d"),
             "calc_rev_msrp": st.column_config.NumberColumn("月零售流水($)", format="$%d"),
             "active_stores": st.column_config.NumberColumn("有效门店", width=70),
             "house_age": st.column_config.NumberColumn("房龄", format="%d年", width=65),
             "pog": st.column_config.TextColumn("POG货架排面建议", width=140),
-            "foundation": st.column_config.TextColumn("典型地基基底", width=160)
+            "foundation": st.column_config.TextColumn("典型地基基底", width=160),
+            "climate": st.column_config.TextColumn("气候带", width=120),
+            "frost_depth": st.column_config.NumberColumn("冻土(寸)", format="%d寸", width=70),
+            "salt_risk": st.column_config.TextColumn("融雪盐", width=70)
         },
         height=480,
         hide_index=True
@@ -726,17 +776,18 @@ with tab_rank:
     tier_counts = df_all["tier"].value_counts().reset_index()
     tier_counts.columns = ["战略梯队", "州数量"]
     
+    # 强制水平条形图，文字绝不旋转
     tier_chart = alt.Chart(tier_counts).mark_bar(color="#2563EB").encode(
         x=alt.X("州数量:Q", title="覆盖州数量"),
         y=alt.Y("战略梯队:N", sort=None, axis=alt.Axis(labelAngle=0, title=None)),
         tooltip=["战略梯队", "州数量"]
-    ).properties(height=180)
+    ).properties(height=160)
     st.altair_chart(tier_chart, use_container_width=True)
 
-# ----------------- TAB 2: 单州深度调研与竞品横向对标 (彻底修复截断与文字方向) -----------------
+# ----------------- TAB 2: 单州深度调研与对家横向对标大盘 -----------------
 with tab_deepdive:
-    st.markdown("### 🎯 威霖单州全景深度调研与竞品横向对标看板")
-    st.caption("穿透分析单一州的自然建筑基底，对比全美大盘均值，并与北美在售头部竞品展开结构化参数级对标。")
+    st.markdown("### 🎯 威霖单州全景深度调研与竞品横向对标大盘")
+    st.caption("穿透分析单一州的自然建筑基底，对比全美大盘均值，并与北美在售头部竞品展开参数级对标。")
     
     target_abbr = st.selectbox("👉 选择要穿透调研的目标州：", df_sorted["abbr"].tolist(), index=0)
     cur = df_sorted[df_sorted["abbr"] == target_abbr].iloc[0]
@@ -745,7 +796,7 @@ with tab_deepdive:
     vel_vs_nat = round(((cur['calc_vel'] - national_avg_vel) / national_avg_vel) * 100, 1)
     vel_delta_str = f"超出大盘均值 +{vel_vs_nat}%" if vel_vs_nat >= 0 else f"低于大盘均值 {vel_vs_nat}%"
     
-    # 第一层：大盘对比与基本面 (采用自适应卡片，文字绝不截断)
+    # 第一层：大盘对比与基本面 (自适应卡片)
     col_d1, col_d2, col_d3 = st.columns([1, 1.1, 1])
     with col_d1:
         st.markdown(f"""
@@ -784,7 +835,6 @@ with tab_deepdive:
     # 第二层：核心对家参数对比大表 (彻底解决截断，指标化细致对标)
     st.markdown(f"#### ⚔️ 该州当前品类：宁波威霖 (Runner) VS 北美头部对家结构化对比表")
     
-    # 计算单店单年为商超多贡献的利润美金额
     annual_dollar_gain = int(cur["calc_vel"] * 12 * (gross_profit_unit - 4.50))
     dollar_gain_str = f"+${annual_dollar_gain:,} 美元/店/年" if annual_dollar_gain > 0 else "+$1,250 美元/店/年"
     
@@ -800,7 +850,6 @@ with tab_deepdive:
         {"对标维度": "9. 对家核心产品短板", "北美头部对家表现": rival_info["rival_weakness"], "宁波威霖 (Runner) 表现": "6063-T5 阳极铝合金、PVD 绿膜、AF 纳米防指纹"},
         {"对标维度": "10. 买手谈盘进攻战术", "北美头部对家表现": "依靠既有品牌惯性，交期与价格僵化", "宁波威霖 (Runner) 表现": rival_info["willi_tactic"]}
     ])
-    
     st.dataframe(rival_df, use_container_width=True, hide_index=True)
     
     # 第三层：横向水平条形图 (彻底修复文字旋转 90 度 Bug，正常水平视角显示)
@@ -811,12 +860,11 @@ with tab_deepdive:
         st.caption("外贸业务排产配箱核心依据 (横向水平阅读，无旋转)：")
         size_data = pd.DataFrame(list(cur["size_breakdown_dict"].items()), columns=["规格尺寸", "销售占比(%)"])
         
-        # 强制 labelAngle=0，文字保持水平
         size_chart = alt.Chart(size_data).mark_bar(color="#2563EB").encode(
             x=alt.X("销售占比(%):Q", title="占比 (%)"),
             y=alt.Y("规格尺寸:N", sort=None, axis=alt.Axis(labelAngle=0, title=None)),
             tooltip=["规格尺寸", "销售占比(%)"]
-        ).properties(height=200)
+        ).properties(height=180)
         st.altair_chart(size_chart, use_container_width=True)
         
     with c_graph2:
@@ -831,10 +879,26 @@ with tab_deepdive:
             x=alt.X("度日数:Q", title="度日数 (Degree Days)"),
             y=alt.Y("指标:N", sort=None, axis=alt.Axis(labelAngle=0, title=None)),
             tooltip=["指标", "度日数"]
-        ).properties(height=200)
+        ).properties(height=180)
         st.altair_chart(energy_chart, use_container_width=True)
 
-    # 业务谈盘实操建议
+    # 第四层：单州规格装箱配比明细大盘表
+    st.markdown("##### 📦 该州细分规格装柜推荐配箱大盘表 (Assortment Planning)")
+    assort_rows = []
+    for sz_name, sz_pct in cur["size_breakdown_dict"].items():
+        sz_month_units = int(cur["calc_tot"] * (sz_pct / 100.0))
+        sz_month_cases = int(sz_month_units / case_pack)
+        sz_40hq_cases = int(960 * (sz_pct / 100.0))
+        assort_rows.append({
+            "细分规格尺寸": sz_name,
+            "当地需求配比": f"{sz_pct}%",
+            "该州月需求件数": f"{sz_month_units:,} 件",
+            "建议月备货箱数": f"{sz_month_cases:,} 箱",
+            "40HQ整柜配箱推荐": f"{sz_40hq_cases} 箱/柜",
+            "建议单品售价 (MSRP)": f"${retail_msrp:.2f}"
+        })
+    st.dataframe(pd.DataFrame(assort_rows), use_container_width=True, hide_index=True)
+
     st.markdown(f"""
     <div class="advice-box">
         <b>💼 威霖外贸业务员与商超买手谈盘指引 (Buyer Pitch Advice)：</b><br>
@@ -842,7 +906,31 @@ with tab_deepdive:
     </div>
     """, unsafe_allow_html=True)
 
-# ----------------- TAB 3: 客户人居画像透视 -----------------
+# ----------------- TAB 3: 渠道网络与货架策略大盘 -----------------
+with tab_channel_pog:
+    st.markdown("### 🏬 渠道网络渗透与货架策略大盘 (Channel & POG Merchandising)")
+    st.caption("穿透各大零售商在各州的网点分布、货架陈列位（Facings）及商超买手审核（Line Review）策略。")
+    
+    st.markdown("#### 1. 该州三大零售商渗透与货架位置规划矩阵")
+    pog_matrix_df = pd.DataFrame([
+        {"陈列货架区域": "主通道黄金视线排面 (Eye-Level 12-24寸)", "适合威霖产品": "高流速 4x10/4x12 阳极氧化铝/拉丝镍款", "抢夺对家目标": "抢夺 Accord / Oatey 既有平销排面", "买手说服理由": "同等排面下，威霖提供 52%+ 毛利，单店坪效提升 25%"},
+        {"陈列货架区域": "促销端架堆头 (Endcap Feature)", "适合威霖产品": "Q3入冬防寒季套件包 / 门底密封条多件装", "抢夺对家目标": "抢占入秋促销黄金曝光期", "买手说服理由": "结合季节性脉冲，以 Contractor Pack 形式做堆头走量，拉升单次客单价"},
+        {"陈列货架区域": "侧挂网架吊袋 (Clip-Strip / Side-Wing)", "适合威霖产品": "地漏防臭硅胶芯、替换螺丝包、防滑贴条", "抢夺对家目标": "无固定排面，创造冲动交叉购买", "买手说服理由": "零货架占位成本，挂在主通道货架侧边，毛利率超 65%"},
+        {"陈列货架区域": "地台整托平铺 (Pallet Drop / Base Deck)", "适合威霖产品": "C型装配槽钢、重载管道固定管夹大包装", "抢夺对家目标": "对标 Superstrut 散货陈列区", "买手说服理由": "Pro 承包商推平板车直接拉走整箱，降低理货人工成本"}
+    ])
+    st.dataframe(pog_matrix_df, use_container_width=True, hide_index=True)
+    
+    st.markdown("#### 2. Big 3 零售巨头渠道格局 (THD vs Lowe's vs Menards)")
+    top15 = df_res.sort_values("calc_tot", ascending=False).head(15)
+    chart_df = pd.DataFrame({
+        "州": top15["cn"],
+        "THD (家得宝)": top15["calc_vel"] * top15["thd"],
+        "Lowe's (劳氏)": top15["calc_vel"] * top15["lowes"],
+        "Menards (美纳斯)": top15["calc_vel"] * top15["menards"]
+    }).set_index("州")
+    st.bar_chart(chart_df, height=320)
+
+# ----------------- TAB 4: 客户人居画像透视 -----------------
 with tab_persona:
     st.markdown("### 👥 目标州人居生活方式、买家画像与防退包装策略")
     st.caption("针对美国家装消费者的真实生活习惯，指导外贸开发规避差评与退货。")
@@ -861,7 +949,7 @@ with tab_persona:
             x=alt.X("占比估算 (%):Q", title="渗透比例 (%)"),
             y=alt.Y("客群类型:N", sort=None, axis=alt.Axis(labelAngle=0, title=None)),
             tooltip=["客群类型", "占比估算 (%)"]
-        ).properties(height=220)
+        ).properties(height=180)
         st.altair_chart(persona_chart, use_container_width=True)
         
     with p_col2:
@@ -874,89 +962,57 @@ with tab_persona:
         ])
         st.dataframe(anti_return_df, use_container_width=True, hide_index=True)
 
-# ----------------- TAB 4: 渠道格局与港口供应链 -----------------
-with tab_channel:
-    st.markdown("#### 📊 Big 3 零售巨头渠道格局 (THD vs Lowe's vs Menards)")
-    top15 = df_res.sort_values("calc_tot", ascending=False).head(15)
-    chart_df = pd.DataFrame({
-        "州": top15["cn"],
-        "THD (家得宝)": top15["calc_vel"] * top15["thd"],
-        "Lowe's (劳氏)": top15["calc_vel"] * top15["lowes"],
-        "Menards (美纳斯)": top15["calc_vel"] * top15["menards"]
-    }).set_index("州")
-    st.bar_chart(chart_df, height=340)
+# ----------------- TAB 5: 供应链海运与出口合规 -----------------
+with tab_supply_cert:
+    st.markdown("### 🚢 供应链海运、集装箱测算与合规认证雷达")
     
-    st.markdown("---")
-    st.markdown("#### 🚢 40HQ 集装箱装载量：整托打托 (Palletized) vs 散装平铺 (Floor-Loaded) 详细测算")
+    st.markdown("#### 1. 40HQ 集装箱装载量：整托打托 (Palletized) vs 散装平铺 (Floor-Loaded)")
+    pal_cases = 48
+    pal_units = case_pack * pal_cases
+    pal_total_cases = pal_cases * 20
+    pal_total_units = pal_total_cases * case_pack
+    pal_fob = pal_total_units * fob_cost
+    pal_freight_unit = round(6500.0 / pal_total_units, 2)
     
-    c_ship1, c_ship2 = st.columns(2)
-    with c_ship1:
-        st.markdown("##### 1. 两种集装箱出运装载模式对比大表")
-        
-        # 打托数据 (20 托盘)
-        pal_cases = 48
-        pal_units = case_pack * pal_cases
-        pal_total_cases = pal_cases * 20
-        pal_total_units = pal_total_cases * case_pack
-        pal_fob = pal_total_units * fob_cost
-        pal_freight_unit = round(6500.0 / pal_total_units, 2)  # 假定 $6500 整柜运费
-        
-        # 散装平铺数据 (不打托，多装 20%)
-        fl_total_cases = int(pal_total_cases * 1.20)
-        fl_total_units = fl_total_cases * case_pack
-        fl_fob = fl_total_units * fob_cost
-        fl_freight_unit = round(6500.0 / fl_total_units, 2)
-        
-        container_compare_df = pd.DataFrame([
-            {"出运测算参数": "出运装载方式", "模式A：美标打托 (Palletized)": "整柜装 20 个 GMA 托盘 (商超RDC偏好)", "模式B：散装平铺 (Floor-Loaded)": "纸箱从底码到顶 (海外仓偏好)"},
-            {"出运测算参数": "40HQ 装箱总量", "模式A：美标打托 (Palletized)": f"{pal_total_cases:,} 箱", "模式B：散装平铺 (Floor-Loaded)": f"{fl_total_cases:,} 箱 (+20% 容积)"},
-            {"出运测算参数": "40HQ 装载总件数", "模式A：美标打托 (Palletized)": f"{pal_total_units:,} 件", "模式B：散装平铺 (Floor-Loaded)": f"{fl_total_units:,} 件"},
-            {"出运测算参数": "单柜出厂总货值 (FOB)", "模式A：美标打托 (Palletized)": f"${pal_fob:,.2f}", "模式B：散装平铺 (Floor-Loaded)": f"${fl_fob:,.2f}"},
-            {"出运测算参数": "单件分摊海运费 (估算)", "模式A：美标打托 (Palletized)": f"${pal_freight_unit:.2f}/件", "模式B：散装平铺 (Floor-Loaded)": f"${fl_freight_unit:.2f}/件 (更省运费)"},
-            {"出运测算参数": "美方码头卸柜时效", "模式A：美标打托 (Palletized)": "叉车 30 分钟速卸 (无额外人工费)", "模式B：散装平铺 (Floor-Loaded)": "人工搬运 3~4 小时 (产生卸柜费)"}
-        ])
-        st.dataframe(container_compare_df, use_container_width=True, hide_index=True)
-        
-    with c_ship2:
-        st.markdown("##### 2. 美线主要清关口岸航程与内陆干线调度总表")
-        ports_df = pd.DataFrame([
-            {"目标大区": "美西 (加州/内华达)", "清关港口": "洛杉矶 / 长滩港 (LA/LB)", "海运航程": "快船 14~16 天直达", "内陆调度模式": "港口短驳至安大略仓 (Ontario)"},
-            {"目标大区": "美西北 (华州/俄勒冈)", "清关港口": "西雅图 / 塔科马港 (Seattle)", "海运航程": "直达快船 15~18 天", "内陆调度模式": "派送西雅图配送中心 (RDC)"},
-            {"目标大区": "美中 (芝加哥/大湖雪带)", "清关港口": "美西清关转内陆铁路 (IPI)", "海运航程": "海运 15天 + 铁路 7天", "内陆调度模式": "芝加哥约利埃特堆场 (Joliet) 提柜派送"},
-            {"目标大区": "美东南 (北卡/佛州/佐治亚)", "清关港口": "萨凡纳港 (Savannah)", "海运航程": "巴拿马全水路 28~32 天", "内陆调度模式": "直达夏洛特总部与亚特兰大总仓"},
-            {"目标大区": "美南核心 (德州/达拉斯)", "清关港口": "休斯敦港 (Houston)", "海运航程": "全水路直达 30~35 天", "内陆调度模式": "卡车短驳达拉斯仓储中心 (规避铁路费)"}
-        ])
-        st.dataframe(ports_df, use_container_width=True, hide_index=True)
-
-# ----------------- TAB 5: 认证图谱与合规雷达 -----------------
-with tab_cert:
-    st.markdown("### 📜 威霖产品出海：全美通用认证与各州极端法典清单")
-    st.caption("这是 The Home Depot 与 Lowe's 买手进行 Vendor Onboarding 时的强制核验清单。")
+    fl_total_cases = int(pal_total_cases * 1.20)
+    fl_total_units = fl_total_cases * case_pack
+    fl_fob = fl_total_units * fob_cost
+    fl_freight_unit = round(6500.0 / fl_total_units, 2)
     
-    cert_col1, cert_col2 = st.columns(2)
-    with cert_col1:
-        st.markdown(f"#### 🏛️ 【{cat_cfg['name'].split(' ')[0]}】全美通用强制认证大表")
-        certs_table = pd.DataFrame(cat_cfg["national_certs"])
-        certs_table.columns = ["认证标准代码", "测试检验项目", "主考/颁证机构", "商超技术准入要求"]
-        st.dataframe(certs_table, use_container_width=True, hide_index=True)
-            
-    with cert_col2:
-        st.markdown(f"#### 🔴 当前选中州【{cur['cn']}】地方强制法典与法规红线")
-        for s_cert in cur["state_certs"]:
-            st.markdown(f"""
-            <div style="background:#FEF2F2;border:1px solid #FCA5A5;color:#991B1B;padding:8px 12px;border-radius:6px;margin-bottom:6px;font-size:0.88rem;">
-                <b>⚠️ 地方强制准入红线：{s_cert}</b>
-            </div>
-            """, unsafe_allow_html=True)
-            
-        st.markdown(f"""
-        <div style="background:white;border:1px solid #CBD5E1;padding:12px;border-radius:6px;margin-top:10px;font-size:0.85rem;line-height:1.6;">
-            <b>🛡️ 威霖合规风控总备忘录：</b><br>
-            • <b>加州 Prop 65</b>：出光剂与铅析出量必须符合限量，未取得无铅报告必须加印致癌黄标警告，否则面临职业赏金律师诉讼。<br>
-            • <b>佛州与沿海 HVHZ</b>：淋浴门与户外紧固构件进入沿海区域必须具备迈阿密-戴德县 NOA 抗风暴飞弹撞击认证。<br>
-            • <b>商业管道抗震</b>：威霖装配式槽钢支吊架在西海岸必须具备 HCAI / OSHPD 预审批编号，才能参与大型公建工程招投标。
-        </div>
-        """, unsafe_allow_html=True)
+    container_compare_df = pd.DataFrame([
+        {"出运测算参数": "出运装载方式", "模式A：美标打托 (Palletized)": "整柜装 20 个 GMA 托盘 (商超RDC偏好)", "模式B：散装平铺 (Floor-Loaded)": "纸箱从底码到顶 (海外仓偏好)"},
+        {"出运测算参数": "40HQ 装箱总量", "模式A：美标打托 (Palletized)": f"{pal_total_cases:,} 箱", "模式B：散装平铺 (Floor-Loaded)": f"{fl_total_cases:,} 箱 (+20% 容积)"},
+        {"出运测算参数": "40HQ 装载总件数", "模式A：美标打托 (Palletized)": f"{pal_total_units:,} 件", "模式B：散装平铺 (Floor-Loaded)": f"{fl_total_units:,} 件"},
+        {"出运测算参数": "单柜出厂总货值 (FOB)", "模式A：美标打托 (Palletized)": f"${pal_fob:,.2f}", "模式B：散装平铺 (Floor-Loaded)": f"${fl_fob:,.2f}"},
+        {"出运测算参数": "单件分摊海运费 (估算)", "模式A：美标打托 (Palletized)": f"${pal_freight_unit:.2f}/件", "模式B：散装平铺 (Floor-Loaded)": f"${fl_freight_unit:.2f}/件 (更省运费)"},
+        {"出运测算参数": "美方码头卸柜时效", "模式A：美标打托 (Palletized)": "叉车 30 分钟速卸 (无额外人工费)", "模式B：散装平铺 (Floor-Loaded)": "人工搬运 3~4 小时 (产生卸柜费)"}
+    ])
+    st.dataframe(container_compare_df, use_container_width=True, hide_index=True)
+    
+    st.markdown("#### 2. 美线主要清关口岸航程与内陆干线调度总表")
+    ports_df = pd.DataFrame([
+        {"目标大区": "美西 (加州/内华达)", "清关港口": "洛杉矶 / 长滩港 (LA/LB)", "海运航程": "快船 14~16 天直达", "内陆调度模式": "港口短驳至安大略仓 (Ontario)"},
+        {"目标大区": "美西北 (华州/俄勒冈)", "清关港口": "西雅图 / 塔科马港 (Seattle)", "海运航程": "直达快船 15~18 天", "内陆调度模式": "派送西雅图配送中心 (RDC)"},
+        {"目标大区": "美中 (芝加哥/大湖雪带)", "清关港口": "美西清关转内陆铁路 (IPI)", "海运航程": "海运 15天 + 铁路 7天", "内陆调度模式": "芝加哥约利埃特堆场 (Joliet) 提柜派送"},
+        {"目标大区": "美东南 (北卡/佛州/佐治亚)", "清关港口": "萨凡纳港 (Savannah)", "海运航程": "巴拿马全水路 28~32 天", "内陆调度模式": "直达夏洛特总部与亚特兰大总仓"},
+        {"目标大区": "美南核心 (德州/达拉斯)", "清关港口": "休斯敦港 (Houston)", "海运航程": "全水路直达 30~35 天", "内陆调度模式": "卡车短驳达拉斯仓储中心 (规避铁路费)"}
+    ])
+    st.dataframe(ports_df, use_container_width=True, hide_index=True)
+    
+    st.markdown("#### 3. 威霖产品出海：全美通用强制认证大表")
+    certs_table = pd.DataFrame(cat_cfg["national_certs"])
+    certs_table.columns = ["认证标准代码", "测试检验项目", "主考/颁证机构", "商超技术准入要求"]
+    st.dataframe(certs_table, use_container_width=True, hide_index=True)
+    
+    st.markdown(f"""
+    <div class="radar-box">
+        <b>🛡️ 选中州【{cur['cn']}】地方强制准入红线与合规备忘录：</b><br>
+        • <b>地方特有法典</b>: {'；'.join(cur['state_certs'])}<br>
+        • <b>加州 Prop 65</b>：出光剂与铅析出量必须符合限量，未取得无铅报告必须加印致癌黄标警告，否则面临赏金律师诉讼。<br>
+        • <b>佛州与沿海 HVHZ</b>：淋浴门与户外紧固构件进入沿海区域必须具备迈阿密-戴德县 NOA 抗风暴飞弹撞击认证。<br>
+        • <b>商业管道抗震</b>：威霖装配式槽钢支吊架在西海岸必须具备 HCAI / OSHPD 预审批编号，才能参与大型公建工程招投标。
+    </div>
+    """, unsafe_allow_html=True)
 
 # ==============================================================================
 # 9. 完整决策数据一键导出 CSV
